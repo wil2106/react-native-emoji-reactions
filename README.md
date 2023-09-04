@@ -7,7 +7,7 @@
 ## 🪄 Installation
 
 ```sh
-yarn add rn-emoji-reactions
+yarn add react-native-emoji-reactions
 ```
 
 ### Dependencies
