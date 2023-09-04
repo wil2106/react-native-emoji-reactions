@@ -25,7 +25,7 @@ export default function Avatar({
       ) : (
         <PngIcon
           fill={avatarColor}
-          source={require('../assets/icons/add.png')}
+          source={require('../assets/icons/user.png')}
         />
       )}
     </View>
