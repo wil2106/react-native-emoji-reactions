@@ -1,5 +1,4 @@
-import type { TextStyle } from 'react-native';
-import type { ViewStyle } from 'react-native';
+import type { ViewStyle, TextStyle } from 'react-native';
 
 export type ReactionsProps = {
   currentUserId: string | number;
