@@ -1,7 +1,5 @@
-import Reactions from './components/Reactions';
-
-export function multiply(a: number, b: number): Promise<number> {
-  return Promise.resolve(a * b);
-}
+import Reactions from './Reactions';
+import type { EmojiType, ReactionType } from './types';
 
 export { Reactions };
+export { EmojiType, ReactionType };
