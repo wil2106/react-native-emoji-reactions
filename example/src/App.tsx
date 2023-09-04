@@ -1,5 +1,4 @@
 import * as React from 'react';
-
 import { StyleSheet } from 'react-native';
 import {
   Reactions,
@@ -216,10 +215,5 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 10,
     justifyContent: 'center',
-  },
-  box: {
-    width: 60,
-    height: 60,
-    marginVertical: 20,
   },
 });
