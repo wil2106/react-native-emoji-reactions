@@ -8,12 +8,12 @@ export type ReactionsProps = {
   onRemoveReaction: (slug: string) => void;
   onOpenUserProfile?: (id: string | number) => void;
 
-  reactionsTheme?: RecursivePartial<ReactionsTheme>;
+  reactionsTheme?: ReactionsTheme;
 
-  reactionsRecordsTheme?: RecursivePartial<ReactionRecordsTheme>;
+  reactionsRecordsTheme?: ReactionRecordsTheme;
   reactionsRecordsEnableGroupChangeAnimation?: boolean;
 
-  emojiPickerTheme?: RecursivePartial<EmojiPickerTheme>;
+  emojiPickerTheme?: EmojiPickerTheme;
   emojiPickerEmojiSize?: number;
   emojiPickerExpandable?: boolean;
   emojiPickerHideHeader?: boolean;
@@ -49,7 +49,7 @@ export type ReactionsRecordsProps = {
   reactionsGroups: ReactionGroupType[];
   onClose: () => void;
   onOpenUserProfile?: (id: string | number) => void;
-  theme?: RecursivePartial<ReactionRecordsTheme>;
+  theme?: ReactionRecordsTheme;
   reactionsRecordsEnableGroupChangeAnimation?: boolean;
 };
 
@@ -104,45 +104,45 @@ export type CategoryTranslation = {
 export type CategoryPosition = 'floating' | 'top' | 'bottom';
 
 export type ReactionsTheme = {
-  inactiveChipBackground: string;
-  activeChipBackground: string;
-  inactiveChipText: string;
-  activeChipText: string;
-  addIcon: string;
+  inactiveChipBackground?: string;
+  activeChipBackground?: string;
+  inactiveChipText?: string;
+  activeChipText?: string;
+  addIcon?: string;
 };
 
 export type ReactionRecordsTheme = {
-  handle: string;
-  background: string;
-  activeHeaderBar: string;
-  activeHeaderGroupText: string;
-  headerGroupText: string;
-  userItemNameText: string;
-  divider: string;
-  userItemAvatarBackground: string;
-  userItemAvatar: string;
+  handle?: string;
+  background?: string;
+  activeHeaderBar?: string;
+  activeHeaderGroupText?: string;
+  headerGroupText?: string;
+  userItemNameText?: string;
+  divider?: string;
+  userItemAvatarBackground?: string;
+  userItemAvatar?: string;
 };
 
 export type EmojiPickerTheme = {
-  backdrop: string;
-  knob: string;
-  container: string;
-  header: string;
-  skinTonesContainer: string;
-  category: {
-    icon: string;
-    iconActive: string;
-    container: string;
-    containerActive: string;
+  backdrop?: string;
+  knob?: string;
+  container?: string;
+  header?: string;
+  skinTonesContainer?: string;
+  category?: {
+    icon?: string;
+    iconActive?: string;
+    container?: string;
+    containerActive?: string;
   };
-  search: {
-    background: string;
-    text: string;
-    placeholder: string;
-    icon: string;
+  search?: {
+    background?: string;
+    text?: string;
+    placeholder?: string;
+    icon?: string;
   };
-  emoji: {
-    selected: string;
+  emoji?: {
+    selected?: string;
   };
 };
 
@@ -184,7 +184,3 @@ export type JsonEmoji = {
   toneEnabled: boolean;
   keywords?: string[];
 };
-
-export type RecursivePartial<T> = Partial<{
-  [P in keyof T]: T[P] extends object ? Partial<T[P]> : T[P];
-}>;
