@@ -1,5 +1,6 @@
 import React from 'react';
-import { Image, StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
+import { Image } from 'expo-image';
 import PngIcon from './PngIcon';
 
 export default function Avatar({
@@ -21,7 +22,7 @@ export default function Avatar({
       ]}
     >
       {uri ? (
-        <Image source={{ uri }} style={styles.image} resizeMode="cover" />
+        <Image source={{ uri }} style={styles.image} contentFit="cover" />
       ) : (
         <PngIcon
           fill={avatarColor}

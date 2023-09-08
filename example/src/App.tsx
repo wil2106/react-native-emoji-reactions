@@ -10,7 +10,7 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 const CURRENT_USER = {
   id: 88787,
   name: 'john',
-  avatarUrl: 'https://picsum.photos/200',
+  avatarUrl: 'https://picsum.photos/300',
 };
 
 const REACTIONS = [
@@ -19,7 +19,7 @@ const REACTIONS = [
     user: {
       id: 88787,
       name: 'john',
-      avatarUrl: 'https://picsum.photos/200',
+      avatarUrl: 'https://picsum.photos/301',
     },
     emoji: {
       emoji: '😃',
@@ -35,7 +35,7 @@ const REACTIONS = [
     user: {
       id: 15454,
       name: 'jake',
-      avatarUrl: 'https://picsum.photos/200',
+      avatarUrl: 'https://picsum.photos/302',
     },
     emoji: {
       emoji: '😇',
@@ -51,7 +51,7 @@ const REACTIONS = [
     user: {
       id: 15454,
       name: 'lea',
-      avatarUrl: 'https://picsum.photos/200',
+      avatarUrl: 'https://picsum.photos/303',
     },
     emoji: {
       emoji: '🐌',
@@ -82,7 +82,7 @@ const REACTIONS = [
     user: {
       id: 878,
       name: 'billy',
-      avatarUrl: 'https://picsum.photos/200',
+      avatarUrl: 'https://picsum.photos/304',
     },
     emoji: {
       emoji: '🍛',
@@ -98,7 +98,7 @@ const REACTIONS = [
     user: {
       id: 1544,
       name: 'alice',
-      avatarUrl: 'https://picsum.photos/200',
+      avatarUrl: 'https://picsum.photos/305',
     },
     emoji: {
       emoji: '🏠',
@@ -114,7 +114,7 @@ const REACTIONS = [
     user: {
       id: 369,
       name: 'barry',
-      avatarUrl: 'https://picsum.photos/200',
+      avatarUrl: 'https://picsum.photos/306',
     },
     emoji: {
       emoji: '🎪',
@@ -130,7 +130,7 @@ const REACTIONS = [
     user: {
       id: 147,
       name: 'eric',
-      avatarUrl: 'https://picsum.photos/200',
+      avatarUrl: 'https://picsum.photos/307',
     },
     emoji: {
       emoji: '🚄',
@@ -146,7 +146,7 @@ const REACTIONS = [
     user: {
       id: 7814,
       name: 'garry',
-      avatarUrl: 'https://picsum.photos/200',
+      avatarUrl: 'https://picsum.photos/308',
     },
     emoji: {
       emoji: '😃',
@@ -162,7 +162,7 @@ const REACTIONS = [
     user: {
       id: 15843,
       name: 'louie',
-      avatarUrl: 'https://picsum.photos/200',
+      avatarUrl: 'https://picsum.photos/309',
     },
     emoji: {
       emoji: '🎳',
