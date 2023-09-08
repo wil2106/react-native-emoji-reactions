@@ -110,7 +110,7 @@ export default function ReactionsRecords({
                 />
               )}
               keyExtractor={(item, flatListItemIndex) =>
-                `${item.id}-${flatListItemIndex}`
+                `${item.emoji}-${item.user.id}-${flatListItemIndex}`
               }
             />
           ))}

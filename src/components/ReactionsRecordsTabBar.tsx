@@ -94,7 +94,7 @@ export default function ReactionsRecordsTabBar({
                 },
               ]}
             >
-              {reactionsgroup.emoji.emoji} {reactionsgroup.reactions.length}
+              {reactionsgroup.emoji} {reactionsgroup.reactions.length}
             </Text>
           </Pressable>
         ))}

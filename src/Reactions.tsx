@@ -1,6 +1,6 @@
 import React, { cloneElement, useCallback, useMemo, useState } from 'react';
 import EmojiPicker, { useRecentPicksPersistence } from 'rn-emoji-keyboard';
-import type { EmojiType, ReactionGroupType, ReactionsProps } from './types';
+import type { ReactionGroupType, ReactionsProps } from './types';
 import { View } from 'react-native';
 import { StyleSheet } from 'react-native';
 import ButtonChip from './components/ButtonChip';
@@ -56,14 +56,14 @@ export default function Reactions({
     const groupedReactionsObj = reactions.reduce(
       (prev, curr) => ({
         ...prev,
-        [curr.emoji.emoji]: {
+        [curr.emoji]: {
           emoji: curr.emoji,
           currentUserInIt:
-            prev[curr.emoji.emoji]?.currentUserInIt === true
+            prev[curr.emoji]?.currentUserInIt === true
               ? true
               : curr.user.id === currentUserId,
-          reactions: prev[curr.emoji.emoji]?.reactions
-            ? [...prev[curr.emoji.emoji]!.reactions, curr]
+          reactions: prev[curr.emoji]?.reactions
+            ? [...prev[curr.emoji]!.reactions, curr]
             : [curr],
         },
       }),
@@ -88,7 +88,7 @@ export default function Reactions({
   const onPressButtonChip = useCallback(
     (reactionGroup: ReactionGroupType) => {
       if (reactionGroup.currentUserInIt) {
-        onRemoveReaction(reactionGroup.emoji.slug);
+        onRemoveReaction(reactionGroup.emoji);
       } else {
         onAddReaction(reactionGroup.emoji);
       }
@@ -96,13 +96,12 @@ export default function Reactions({
     [onAddReaction, onRemoveReaction]
   );
 
-  const onSelectEmoji = (emoji: EmojiType) => {
+  const onSelectEmoji = (emoji: string) => {
     // check if not already added
     if (
       !reactions.some(
         (reaction) =>
-          reaction.user.id === currentUserId &&
-          reaction.emoji.slug === emoji.slug
+          reaction.user.id === currentUserId && reaction.emoji === emoji
       )
     ) {
       onAddReaction(emoji);
@@ -114,8 +113,8 @@ export default function Reactions({
       <View style={styles.container}>
         {groupedReactions.map((reactionGroup, index) => (
           <ButtonChip
-            key={`${reactionGroup}-${index}`}
-            emoji={reactionGroup.emoji.emoji}
+            key={`${reactionGroup.emoji}-${index}`}
+            emoji={reactionGroup.emoji}
             selected={reactionGroup.currentUserInIt}
             onPress={() => onPressButtonChip(reactionGroup)}
             count={reactionGroup.reactions.length}
@@ -148,7 +147,7 @@ export default function Reactions({
         <EmojiPicker
           open={emojiPickerOpened}
           onClose={() => setEmojiPickerOpened(false)}
-          onEmojiSelected={onSelectEmoji}
+          onEmojiSelected={(emo) => onSelectEmoji(emo.emoji)}
           emojiSize={emojiPickerEmojiSize ?? 28}
           expandable={emojiPickerExpandable ?? true}
           hideHeader={emojiPickerHideHeader}

@@ -4,7 +4,7 @@ export type ReactionsProps = {
   currentUserId: string | number;
   reactions: ReactionType[];
   hideAddButton?: boolean;
-  onAddReaction: (emoji: EmojiType) => void;
+  onAddReaction: (emoji: string) => void;
   onRemoveReaction: (slug: string) => void;
   onOpenUserProfile?: (id: string | number) => void;
 
@@ -33,8 +33,7 @@ export type ReactionsProps = {
 };
 
 export type ReactionType = {
-  id: string | number;
-  emoji: EmojiType;
+  emoji: string;
   user: UserType;
 };
 
@@ -56,7 +55,7 @@ export type ReactionsRecordsProps = {
 export type ReactionGroupType = {
   reactions: ReactionType[];
   currentUserInIt: boolean;
-  emoji: EmojiType;
+  emoji: string;
 };
 
 export type EmojiPickerProps = {
@@ -95,7 +94,7 @@ export const CATEGORIES_NAVIGATION = [
 export type IconNames = (typeof CATEGORIES_NAVIGATION)[number]['icon'];
 export type CategoryTypes = (typeof CATEGORIES_NAVIGATION)[number]['category'];
 
-export type OnEmojiSelected = (emoji: EmojiType) => void;
+export type OnEmojiSelected = (emoji: string) => void;
 
 export type CategoryTranslation = {
   [key in CategoryTypes]: string;
@@ -161,15 +160,6 @@ export type Styles = {
   emoji: {
     selected: ViewStyle;
   };
-};
-
-export type EmojiType = {
-  emoji: string;
-  name: string;
-  slug: string;
-  unicode_version: string;
-  toneEnabled: boolean;
-  alreadySelected?: boolean;
 };
 
 export type EmojisByCategory = {
