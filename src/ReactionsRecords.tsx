@@ -80,6 +80,10 @@ export default function ReactionsRecords({
           reactionsGroups={reactionsGroups}
           selectedGroupIndex={selectedGroupIndex}
           setSelectedGroupIndex={setSelectedGroupIndex}
+          dividerColor={theme?.divider}
+          activeHeaderGroupText={theme?.activeHeaderGroupText}
+          inactiveHeaderGroupText={theme?.inactiveHeaderGroupText}
+          activeHeaderBar={theme?.activeHeaderBar}
         />
         <ScrollView
           ref={scrollViewRef}
@@ -100,6 +104,9 @@ export default function ReactionsRecords({
                 <UserItem
                   user={item.user}
                   onPress={() => onUserItemPress(item.user.id)}
+                  nameTextColor={theme?.userItemNameText}
+                  avatarBackgroundColor={theme?.userItemAvatarBackground}
+                  avatarColor={theme?.userItemAvatar}
                 />
               )}
               keyExtractor={(item, flatListItemIndex) =>

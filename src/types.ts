@@ -116,7 +116,7 @@ export type ReactionRecordsTheme = {
   background?: string;
   activeHeaderBar?: string;
   activeHeaderGroupText?: string;
-  headerGroupText?: string;
+  inactiveHeaderGroupText?: string;
   userItemNameText?: string;
   divider?: string;
   userItemAvatarBackground?: string;
