@@ -1,19 +1,28 @@
 import * as React from 'react';
 import type { ImageSourcePropType } from 'react-native';
-import { Image } from 'expo-image';
-
-type Props = {
-  fill: string;
-  source: ImageSourcePropType;
-  dimensions?: { width: number; height: number };
-};
-
-export const ICON_DIMENSIONS = { width: 22, height: 22 };
+import { Image, ImageStyle } from 'expo-image';
+import { StyleSheet } from 'react-native';
 
 export default function PngIcon({
   fill,
   source,
-  dimensions = ICON_DIMENSIONS,
-}: Props) {
-  return <Image source={source} style={[{ tintColor: fill }, dimensions]} />;
+  styles,
+}: {
+  fill?: string;
+  source: ImageSourcePropType;
+  styles?: ImageStyle;
+}) {
+  return (
+    <Image
+      source={source}
+      style={[defaultStyle.image, styles, fill ? { tintColor: fill } : {}]}
+    />
+  );
 }
+
+const defaultStyle = StyleSheet.create({
+  image: {
+    width: 22,
+    height: 22,
+  },
+});

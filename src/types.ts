@@ -1,3 +1,4 @@
+import type { ImageStyle } from 'expo-image';
 import type { ViewStyle, TextStyle } from 'react-native';
 
 export type ReactionsProps = {
@@ -5,15 +6,19 @@ export type ReactionsProps = {
   reactions: ReactionType[];
   hideAddButton?: boolean;
   onAddReaction: (emoji: string) => void;
-  onRemoveReaction: (slug: string) => void;
-  onOpenUserProfile?: (id: string | number) => void;
+  onRemoveReaction: (reactionId: string | number) => void;
+  onOpenUserProfile?: (userId: string | number) => void;
+  disableHaptics?: boolean;
 
   reactionsTheme?: ReactionsTheme;
+  reactionsStyles?: ReactionsStyles;
 
-  reactionsRecordsTheme?: ReactionRecordsTheme;
+  reactionsRecordsTheme?: ReactionsRecordsTheme;
   reactionsRecordsEnableGroupChangeAnimation?: boolean;
+  reactionsrecordsStyles?: ReactionsRecordsStyles;
 
   emojiPickerTheme?: EmojiPickerTheme;
+  emojiPickerStyles?: EmojiPickerStyles;
   emojiPickerEmojiSize?: number;
   emojiPickerExpandable?: boolean;
   emojiPickerHideHeader?: boolean;
@@ -33,6 +38,7 @@ export type ReactionsProps = {
 };
 
 export type ReactionType = {
+  id: string | number;
   emoji: string;
   user: UserType;
 };
@@ -48,7 +54,8 @@ export type ReactionsRecordsProps = {
   reactionsGroups: ReactionGroupType[];
   onClose: () => void;
   onOpenUserProfile?: (id: string | number) => void;
-  theme?: ReactionRecordsTheme;
+  theme?: ReactionsRecordsTheme;
+  styles?: ReactionsRecordsStyles;
   reactionsRecordsEnableGroupChangeAnimation?: boolean;
 };
 
@@ -56,25 +63,6 @@ export type ReactionGroupType = {
   reactions: ReactionType[];
   currentUserInIt: boolean;
   emoji: string;
-};
-
-export type EmojiPickerProps = {
-  emojiPickerEmojiSize?: number;
-  emojiPickerExpandable?: boolean;
-  emojiPickerHideHeader?: boolean;
-  emojiPickerDefaultHeight?: number | string;
-  emojiPickerExpandedHeight?: number | string;
-  emojiPickerTranslation?: CategoryTranslation;
-  emojiPickerDisabledCategories?: CategoryTypes[];
-  emojiPickerEnableRecentlyUsed?: boolean;
-  emojiPickerCategoryPosition?: CategoryPosition;
-  emojiPickerEnableSearchBar?: boolean;
-  emojiPickerCategoryOrder?: CategoryTypes[];
-  emojiPickerDisableSafeArea?: boolean;
-  emojiPickerEnableSearchAnimation?: boolean;
-  emojiPickerEnableCategoryChangeAnimation?: boolean;
-  emojiPickerEnableCategoryChangeGesture?: boolean;
-  emojiPickerEmojisByCategory?: EmojisByCategory[];
 };
 
 export const CATEGORIES_NAVIGATION = [
@@ -103,23 +91,43 @@ export type CategoryTranslation = {
 export type CategoryPosition = 'floating' | 'top' | 'bottom';
 
 export type ReactionsTheme = {
+  reactionButton?: ReactionButtonTheme;
+  addReactionButton?: AddReactionButtonTheme;
+};
+
+export type ReactionsRecordsTheme = {
+  knob?: string;
+  background?: string;
+  tabBar?: ReactionsRecordsTabBarTheme;
+  userItem?: UserItemTheme;
+};
+
+export type UserItemTheme = {
+  name?: string;
+  avatar?: AvatarTheme;
+};
+
+export type AvatarTheme = {
+  background?: string;
+  icon?: string;
+};
+
+export type ReactionsRecordsTabBarTheme = {
+  divider?: string;
+  activeHeaderGroupText?: string;
+  inactiveHeaderGroupText?: string;
+  activeHeaderBar?: string;
+};
+
+export type ReactionButtonTheme = {
   inactiveChipBackground?: string;
   activeChipBackground?: string;
   inactiveChipText?: string;
   activeChipText?: string;
-  addIcon?: string;
 };
-
-export type ReactionRecordsTheme = {
-  handle?: string;
+export type AddReactionButtonTheme = {
   background?: string;
-  activeHeaderBar?: string;
-  activeHeaderGroupText?: string;
-  inactiveHeaderGroupText?: string;
-  userItemNameText?: string;
-  divider?: string;
-  userItemAvatarBackground?: string;
-  userItemAvatar?: string;
+  icon?: string;
 };
 
 export type EmojiPickerTheme = {
@@ -145,20 +153,63 @@ export type EmojiPickerTheme = {
   };
 };
 
-export type Styles = {
-  container: ViewStyle;
-  header: TextStyle;
-  knob: ViewStyle;
-  category: {
-    container: ViewStyle;
-    icon: TextStyle;
+export type ReactionsStyles = {
+  container?: ViewStyle;
+  reactionButton?: ReactionButtonStyles;
+  addReactionButton?: AddReactionButtonStyles;
+};
+
+export type ReactionButtonStyles = {
+  container?: ViewStyle;
+  emoji?: TextStyle;
+  text?: TextStyle;
+};
+
+export type AddReactionButtonStyles = {
+  container?: ViewStyle;
+  icon?: ImageStyle;
+};
+
+export type ReactionsRecordsStyles = {
+  knob?: ViewStyle;
+  listContainer?: ViewStyle;
+  tabBar?: ReactionsRecordsTabBarStyles;
+  userItem?: UserItemStyles;
+};
+
+export type ReactionsRecordsTabBarStyles = {
+  divider?: ViewStyle;
+  reactionsGroupContainer?: ViewStyle;
+  reactionsGroupTitle?: TextStyle;
+  activeIndexBar?: ViewStyle;
+};
+
+export type UserItemStyles = {
+  container?: ViewStyle;
+  name?: TextStyle;
+  avatar?: AvatarStyles;
+};
+
+export type AvatarStyles = {
+  container?: ViewStyle;
+  image?: ImageStyle;
+  defaultImage?: ImageStyle;
+};
+
+export type EmojiPickerStyles = {
+  container?: ViewStyle;
+  header?: TextStyle;
+  knob?: ViewStyle;
+  category?: {
+    container?: ViewStyle;
+    icon?: TextStyle;
   };
-  searchBar: {
-    container: ViewStyle;
-    text: TextStyle;
+  searchBar?: {
+    container?: ViewStyle;
+    text?: TextStyle;
   };
-  emoji: {
-    selected: ViewStyle;
+  emoji?: {
+    selected?: ViewStyle;
   };
 };
 

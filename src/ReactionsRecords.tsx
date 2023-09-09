@@ -9,6 +9,7 @@ import CustomBackdrop from './components/CustomBackdrop';
 import ReactionsRecordsTabBar from './components/ReactionsRecordsTabBar';
 import UserItem from './components/UserItem';
 import type { ReactionsRecordsProps } from './types';
+import { Modal } from 'react-native';
 
 const DEVICE_WIDTH = Dimensions.get('window').width;
 
@@ -18,6 +19,7 @@ export default function ReactionsRecords({
   onClose,
   onOpenUserProfile,
   theme,
+  styles,
   reactionsRecordsEnableGroupChangeAnimation,
 }: ReactionsRecordsProps) {
   const snapPoints = useMemo(() => ['45%', '95%'], []);
@@ -61,69 +63,84 @@ export default function ReactionsRecords({
   };
 
   return (
-    <BottomSheetModalProvider>
-      <BottomSheetModal
-        ref={bottomSheetRef}
-        index={0}
-        snapPoints={snapPoints}
-        backdropComponent={CustomBackdrop}
-        enablePanDownToClose={true}
-        onDismiss={onClose}
-        handleIndicatorStyle={{
-          backgroundColor: theme?.handle ?? '#DDDDDD',
-        }}
-        backgroundStyle={{
-          backgroundColor: theme?.background ?? '#FFFFFF',
-        }}
-      >
-        <ReactionsRecordsTabBar
-          reactionsGroups={reactionsGroups}
-          selectedGroupIndex={selectedGroupIndex}
-          setSelectedGroupIndex={setSelectedGroupIndex}
-          dividerColor={theme?.divider}
-          activeHeaderGroupText={theme?.activeHeaderGroupText}
-          inactiveHeaderGroupText={theme?.inactiveHeaderGroupText}
-          activeHeaderBar={theme?.activeHeaderBar}
-        />
-        <ScrollView
-          ref={scrollViewRef}
-          showsHorizontalScrollIndicator={false}
-          horizontal={true}
-          snapToInterval={DEVICE_WIDTH}
-          decelerationRate={0}
-          snapToAlignment="start"
-          onMomentumScrollEnd={onMomentumScrollEnd}
+    <Modal transparent={true} visible={open}>
+      <BottomSheetModalProvider>
+        <BottomSheetModal
+          ref={bottomSheetRef}
+          index={0}
+          snapPoints={snapPoints}
+          backdropComponent={CustomBackdrop}
+          enablePanDownToClose={true}
+          onDismiss={onClose}
+          handleIndicatorStyle={[
+            defaultStyles.knob,
+            styles?.knob,
+            theme?.knob
+              ? {
+                  backgroundColor: theme.knob,
+                }
+              : {},
+          ]}
+          backgroundStyle={[
+            defaultStyles.background,
+            theme?.background
+              ? {
+                  backgroundColor: theme.background,
+                }
+              : {},
+          ]}
         >
-          {reactionsGroups.map((reactionsGroup, reactionsGroupIndex) => (
-            <FlatList
-              key={`${reactionsGroup.emoji}-${reactionsGroupIndex}`}
-              style={{ width: DEVICE_WIDTH }}
-              data={reactionsGroup.reactions}
-              contentContainerStyle={styles.flatListContent}
-              renderItem={({ item }) => (
-                <UserItem
-                  user={item.user}
-                  onPress={() => onUserItemPress(item.user.id)}
-                  nameTextColor={theme?.userItemNameText}
-                  avatarBackgroundColor={theme?.userItemAvatarBackground}
-                  avatarColor={theme?.userItemAvatar}
-                />
-              )}
-              keyExtractor={(item, flatListItemIndex) =>
-                `${item.emoji}-${item.user.id}-${flatListItemIndex}`
-              }
-            />
-          ))}
-        </ScrollView>
-      </BottomSheetModal>
-    </BottomSheetModalProvider>
+          <ReactionsRecordsTabBar
+            reactionsGroups={reactionsGroups}
+            selectedGroupIndex={selectedGroupIndex}
+            setSelectedGroupIndex={setSelectedGroupIndex}
+            theme={theme?.tabBar}
+            styles={styles?.tabBar}
+          />
+          <ScrollView
+            ref={scrollViewRef}
+            showsHorizontalScrollIndicator={false}
+            horizontal={true}
+            snapToInterval={DEVICE_WIDTH}
+            decelerationRate={0}
+            snapToAlignment="start"
+            onMomentumScrollEnd={onMomentumScrollEnd}
+          >
+            {reactionsGroups.map((reactionsGroup, reactionsGroupIndex) => (
+              <FlatList
+                key={`${reactionsGroup.emoji}-${reactionsGroupIndex}`}
+                style={{ width: DEVICE_WIDTH }}
+                data={reactionsGroup.reactions}
+                contentContainerStyle={[
+                  defaultStyles.flatListContent,
+                  styles?.listContainer,
+                ]}
+                renderItem={({ item }) => (
+                  <UserItem
+                    user={item.user}
+                    onPress={() => onUserItemPress(item.user.id)}
+                    theme={theme?.userItem}
+                    styles={styles?.userItem}
+                  />
+                )}
+                keyExtractor={(item, flatListItemIndex) =>
+                  `${item.emoji}-${item.user.id}-${flatListItemIndex}`
+                }
+              />
+            ))}
+          </ScrollView>
+        </BottomSheetModal>
+      </BottomSheetModalProvider>
+    </Modal>
   );
 }
 
-const styles = StyleSheet.create({
-  groupHeaderText: {
-    alignSelf: 'center',
-    fontSize: 18,
+const defaultStyles = StyleSheet.create({
+  background: {
+    backgroundColor: '#FFFFFF',
+  },
+  knob: {
+    backgroundColor: '#DDDDDD',
   },
   flatListContent: {
     gap: 20,

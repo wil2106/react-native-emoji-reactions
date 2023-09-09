@@ -85,7 +85,7 @@ export default function App() {
     ]);
   };
 
-  const onRemoveReaction = (slug: string) => {
+  const onRemoveReaction = (reaction: ReactionType) => {
     setReactions((prevState) =>
       prevState.filter(
         (reaction) =>

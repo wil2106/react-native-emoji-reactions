@@ -1,34 +1,38 @@
 import React from 'react';
 import { StyleSheet, Text, TouchableOpacity } from 'react-native';
-import type { UserType } from 'src/types';
+import type { UserItemStyles, UserItemTheme, UserType } from '../../src/types';
 import Avatar from './Avatar';
 
 export default function UserItem({
   user,
   onPress,
-  nameTextColor = '#1C1C1C',
-  avatarBackgroundColor,
-  avatarColor,
+  theme,
+  styles,
 }: {
   user: UserType;
   onPress?: () => void;
-  nameTextColor?: string;
-  avatarBackgroundColor?: string;
-  avatarColor?: string;
+  theme?: UserItemTheme;
+  styles?: UserItemStyles;
 }) {
   return (
-    <TouchableOpacity style={styles.container} onPress={onPress}>
+    <TouchableOpacity
+      style={[defaultStyles.container, styles?.container]}
+      onPress={onPress}
+    >
       <Avatar
         uri={user.avatarUrl}
-        avatarBackgroundColor={avatarBackgroundColor}
-        avatarColor={avatarColor}
+        theme={theme?.avatar}
+        styles={styles?.avatar}
       />
       <Text
         style={[
-          styles.text,
-          {
-            color: nameTextColor,
-          },
+          defaultStyles.name,
+          styles?.name,
+          theme?.name
+            ? {
+                color: theme.name,
+              }
+            : {},
         ]}
       >
         {user.name}
@@ -37,14 +41,15 @@ export default function UserItem({
   );
 }
 
-const styles = StyleSheet.create({
+const defaultStyles = StyleSheet.create({
   container: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 10,
   },
-  text: {
+  name: {
     fontSize: 18,
     fontWeight: '600',
+    color: '#1C1C1C',
   },
 });

@@ -3,9 +3,11 @@ import EmojiPicker, { useRecentPicksPersistence } from 'rn-emoji-keyboard';
 import type { ReactionGroupType, ReactionsProps } from './types';
 import { View } from 'react-native';
 import { StyleSheet } from 'react-native';
-import ButtonChip from './components/ButtonChip';
+import ReactionButton from './components/ReactionButton';
+import AddReactionButton from './components/AddReactionButton';
 import ReactionsRecords from './ReactionsRecords';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as Haptics from 'expo-haptics';
 
 const STORAGE_KEY = 'REACT-NATIVE-EMOJI-REACTIONS_RECENT';
 
@@ -16,13 +18,16 @@ export default function Reactions({
   onAddReaction,
   onRemoveReaction,
   onOpenUserProfile,
+  disableHaptics,
 
   reactionsTheme,
+  reactionsStyles,
 
   reactionsRecordsTheme,
   reactionsRecordsEnableGroupChangeAnimation = true,
 
   emojiPickerTheme,
+  emojiPickerStyles,
   emojiPickerEmojiSize,
   emojiPickerExpandable,
   emojiPickerHideHeader,
@@ -82,18 +87,34 @@ export default function Reactions({
   }, [currentUserId, reactions]);
 
   const onLongPress = useCallback(() => {
+    if (!disableHaptics) {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    }
     setReactionsRecordsOpened(true);
-  }, []);
+  }, [disableHaptics]);
+
+  const onPressAdd = () => {
+    if (!disableHaptics) {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    }
+    setEmojiPickerOpened(true);
+  };
 
   const onPressButtonChip = useCallback(
     (reactionGroup: ReactionGroupType) => {
       if (reactionGroup.currentUserInIt) {
-        onRemoveReaction(reactionGroup.emoji);
+        const reaction = reactionGroup.reactions.find(
+          (reac) =>
+            reac.emoji === reactionGroup.emoji && reac.user.id === currentUserId
+        );
+        if (reaction?.id) {
+          onRemoveReaction(reaction.id);
+        }
       } else {
         onAddReaction(reactionGroup.emoji);
       }
     },
-    [onAddReaction, onRemoveReaction]
+    [onAddReaction, onRemoveReaction, currentUserId]
   );
 
   const onSelectEmoji = (emoji: string) => {
@@ -110,26 +131,27 @@ export default function Reactions({
 
   return (
     <>
-      <View style={styles.container}>
+      <View
+        style={{ ...defaultStyles.container, ...reactionsStyles?.container }}
+      >
         {groupedReactions.map((reactionGroup, index) => (
-          <ButtonChip
+          <ReactionButton
             key={`${reactionGroup.emoji}-${index}`}
             emoji={reactionGroup.emoji}
             selected={reactionGroup.currentUserInIt}
             onPress={() => onPressButtonChip(reactionGroup)}
             count={reactionGroup.reactions.length}
             onLongPress={onLongPress}
-            inactiveChipBackgroundColor={reactionsTheme?.inactiveChipBackground}
-            activeChipBackgroundColor={reactionsTheme?.activeChipBackground}
-            inactiveChipTextColor={reactionsTheme?.inactiveChipText}
-            activeChipTextColor={reactionsTheme?.activeChipText}
-            addIconColor={reactionsTheme?.addIcon}
+            theme={reactionsTheme?.reactionButton}
+            styles={reactionsStyles?.reactionButton}
           />
         ))}
         {!hideAddButton && (
-          <ButtonChip
-            onPress={() => setEmojiPickerOpened(true)}
+          <AddReactionButton
+            onPress={onPressAdd}
             onLongPress={onLongPress}
+            theme={reactionsTheme?.addReactionButton}
+            styles={reactionsStyles?.addReactionButton}
           />
         )}
       </View>
@@ -160,6 +182,7 @@ export default function Reactions({
           categoryOrder={emojiPickerCategoryOrder}
           disableSafeArea={emojiPickerDisableSafeArea}
           theme={emojiPickerTheme}
+          styles={emojiPickerStyles}
           enableSearchAnimation={emojiPickerEnableSearchAnimation}
           enableCategoryChangeAnimation={
             emojiPickerEnableCategoryChangeAnimation
@@ -177,7 +200,7 @@ export default function Reactions({
   );
 }
 
-const styles = StyleSheet.create({
+const defaultStyles = StyleSheet.create({
   container: {
     flexDirection: 'row',
     flexWrap: 'wrap',

@@ -11,7 +11,11 @@ import Animated, {
   useAnimatedStyle,
   withTiming,
 } from 'react-native-reanimated';
-import type { ReactionGroupType } from '../../src/types';
+import type {
+  ReactionGroupType,
+  ReactionsRecordsTabBarStyles,
+  ReactionsRecordsTabBarTheme,
+} from '../../src/types';
 
 const MIN_ITEM_WIDTH = 60;
 const DEVICE_WIDTH = Dimensions.get('window').width;
@@ -20,18 +24,14 @@ export default function ReactionsRecordsTabBar({
   reactionsGroups,
   selectedGroupIndex,
   setSelectedGroupIndex,
-  dividerColor = '#DDDDDD',
-  activeHeaderGroupText = '#0066A8',
-  inactiveHeaderGroupText = '#1C1C1C',
-  activeHeaderBar = '#0066A8',
+  theme,
+  styles,
 }: {
   reactionsGroups: ReactionGroupType[];
   selectedGroupIndex: number;
   setSelectedGroupIndex: (index: number) => void;
-  dividerColor?: string;
-  activeHeaderGroupText?: string;
-  inactiveHeaderGroupText?: string;
-  activeHeaderBar?: string;
+  theme?: ReactionsRecordsTabBarTheme;
+  styles?: ReactionsRecordsTabBarStyles;
 }) {
   const scrollViewRef = useRef<ScrollView>(null);
 
@@ -66,10 +66,13 @@ export default function ReactionsRecordsTabBar({
     <View>
       <View
         style={[
-          styles.divider,
-          {
-            backgroundColor: dividerColor,
-          },
+          defaultStyles.divider,
+          styles?.divider,
+          theme?.divider
+            ? {
+                backgroundColor: theme?.divider,
+              }
+            : {},
         ]}
       />
       <ScrollView
@@ -80,18 +83,26 @@ export default function ReactionsRecordsTabBar({
         {reactionsGroups.map((reactionsgroup, index) => (
           <Pressable
             key={`${reactionsgroup.emoji}-${index}`}
-            style={[styles.reactionsGroupContainer, { width: itemWidth }]}
+            style={[
+              defaultStyles.reactionsGroupContainer,
+              styles?.reactionsGroupContainer,
+              { width: itemWidth },
+            ]}
             onPress={() => setSelectedGroupIndex(index)}
           >
             <Text
               style={[
-                styles.reactionsGroupTitle,
-                {
-                  color:
-                    index === selectedGroupIndex
-                      ? activeHeaderGroupText
-                      : inactiveHeaderGroupText,
-                },
+                defaultStyles.reactionsGroupTitle,
+                index === selectedGroupIndex
+                  ? defaultStyles?.activeHeaderGroupText
+                  : defaultStyles?.inactiveHeaderGroupText,
+                styles?.reactionsGroupTitle,
+                index === selectedGroupIndex && theme?.activeHeaderGroupText
+                  ? { color: theme.activeHeaderGroupText }
+                  : {},
+                index !== selectedGroupIndex && theme?.inactiveHeaderGroupText
+                  ? { color: theme.inactiveHeaderGroupText }
+                  : {},
               ]}
             >
               {reactionsgroup.emoji} {reactionsgroup.reactions.length}
@@ -100,12 +111,13 @@ export default function ReactionsRecordsTabBar({
         ))}
         <Animated.View
           style={[
-            activeIndexBarAnimatedStyle,
-            styles.activeIndexBar,
-            {
-              backgroundColor: activeHeaderBar,
-            },
+            defaultStyles.activeIndexBar,
+            styles?.activeIndexBar,
+            theme?.activeHeaderBar
+              ? { backgroundColor: theme?.activeHeaderBar }
+              : {},
             { width: itemWidth },
+            activeIndexBarAnimatedStyle,
           ]}
         />
       </ScrollView>
@@ -113,13 +125,16 @@ export default function ReactionsRecordsTabBar({
   );
 }
 
-const styles = StyleSheet.create({
+const defaultStyles = StyleSheet.create({
   divider: {
     position: 'absolute',
     bottom: 0,
     height: 1,
     width: '100%',
+    backgroundColor: '#DDDDDD',
   },
+  activeHeaderGroupText: { color: '#0066A8' },
+  inactiveHeaderGroupText: { color: '#1C1C1C' },
   reactionsGroupContainer: {
     flexDirection: 'row',
     justifyContent: 'center',
@@ -133,5 +148,6 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 0,
     height: 3,
+    backgroundColor: '#0066A8',
   },
 });

@@ -11,6 +11,7 @@ const CURRENT_USER = {
 
 const REACTIONS = [
   {
+    id: 1,
     user: {
       id: 88787,
       name: 'john',
@@ -19,6 +20,7 @@ const REACTIONS = [
     emoji: '😃',
   },
   {
+    id: 2,
     user: {
       id: 15454,
       name: 'jake',
@@ -27,6 +29,7 @@ const REACTIONS = [
     emoji: '😇',
   },
   {
+    id: 3,
     user: {
       id: 15454,
       name: 'lea',
@@ -35,6 +38,7 @@ const REACTIONS = [
     emoji: '🐌',
   },
   {
+    id: 4,
     user: {
       id: 887845,
       name: 'marc',
@@ -42,6 +46,7 @@ const REACTIONS = [
     emoji: '🌶️',
   },
   {
+    id: 5,
     user: {
       id: 878,
       name: 'billy',
@@ -50,6 +55,7 @@ const REACTIONS = [
     emoji: '🍛',
   },
   {
+    id: 6,
     user: {
       id: 1544,
       name: 'alice',
@@ -58,6 +64,7 @@ const REACTIONS = [
     emoji: '🏠',
   },
   {
+    id: 7,
     user: {
       id: 369,
       name: 'barry',
@@ -66,6 +73,7 @@ const REACTIONS = [
     emoji: '🎪',
   },
   {
+    id: 8,
     user: {
       id: 147,
       name: 'eric',
@@ -74,6 +82,7 @@ const REACTIONS = [
     emoji: '🚄',
   },
   {
+    id: 9,
     user: {
       id: 7814,
       name: 'garry',
@@ -82,6 +91,7 @@ const REACTIONS = [
     emoji: '😃',
   },
   {
+    id: 10,
     user: {
       id: 15843,
       name: 'louie',
@@ -101,12 +111,9 @@ export default function App() {
     ]);
   };
 
-  const onRemoveReaction = (emoji: string) => {
+  const onRemoveReaction = (reactionId: string | number) => {
     setReactions((prevState) =>
-      prevState.filter(
-        (reaction) =>
-          !(reaction.emoji === emoji && reaction.user.id === CURRENT_USER.id)
-      )
+      prevState.filter((reac) => reac.id !== reactionId)
     );
   };
   return (
@@ -116,8 +123,8 @@ export default function App() {
         reactions={reactions}
         onAddReaction={onAddReaction}
         onRemoveReaction={onRemoveReaction}
-        onOpenUserProfile={(id) =>
-          console.log(`Open user profile with id: ${id}`)
+        onOpenUserProfile={(userId) =>
+          console.log(`Open user profile with id: ${userId}`)
         }
       />
     </GestureHandlerRootView>
