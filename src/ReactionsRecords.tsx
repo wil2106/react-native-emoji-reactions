@@ -20,7 +20,7 @@ export default function ReactionsRecords({
   onOpenUserProfile,
   theme,
   styles,
-  reactionsRecordsEnableGroupChangeAnimation,
+  enableGroupChangeAnimation,
 }: ReactionsRecordsProps) {
   const snapPoints = useMemo(() => ['45%', '95%'], []);
   const bottomSheetRef = useRef<BottomSheetModal>(null);
@@ -40,10 +40,10 @@ export default function ReactionsRecords({
   useEffect(() => {
     // on selected group index change, scroll horizontal snap scroll view to selected group
     scrollViewRef.current?.scrollTo({
-      animated: reactionsRecordsEnableGroupChangeAnimation,
+      animated: enableGroupChangeAnimation,
       x: selectedGroupIndex * DEVICE_WIDTH,
     });
-  }, [selectedGroupIndex, reactionsRecordsEnableGroupChangeAnimation]);
+  }, [selectedGroupIndex, enableGroupChangeAnimation]);
 
   const onMomentumScrollEnd = (
     event: NativeSyntheticEvent<NativeScrollEvent>

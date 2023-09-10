@@ -166,6 +166,7 @@
     "expo-haptics": "^12.4.0",
     "expo-image": "^1.3.2",
     "expo-modules-core": "^1.5.11",
-    "rn-emoji-keyboard": "^1.5.0"
+    "rn-emoji-keyboard": "^1.5.0",
+    "unicode-emoji-json": "^0.4.0"
   }
 }

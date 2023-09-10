@@ -1,5 +1,5 @@
 import React, { cloneElement, useCallback, useMemo, useState } from 'react';
-import EmojiPicker, { useRecentPicksPersistence } from 'rn-emoji-keyboard';
+//import EmojiPicker, { useRecentPicksPersistence } from 'rn-emoji-keyboard';
 import type { ReactionGroupType, ReactionsProps } from './types';
 import { View } from 'react-native';
 import { StyleSheet } from 'react-native';
@@ -8,6 +8,7 @@ import AddReactionButton from './components/AddReactionButton';
 import ReactionsRecords from './ReactionsRecords';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Haptics from 'expo-haptics';
+import EmojiPicker from './EmojiPicker';
 
 const STORAGE_KEY = 'REACT-NATIVE-EMOJI-REACTIONS_RECENT';
 
@@ -24,6 +25,7 @@ export default function Reactions({
   reactionsStyles,
 
   reactionsRecordsTheme,
+  reactionsRecordsStyles,
   reactionsRecordsEnableGroupChangeAnimation = true,
 
   emojiPickerTheme,
@@ -48,14 +50,14 @@ export default function Reactions({
   const [emojiPickerOpened, setEmojiPickerOpened] = useState(false);
   const [reactionsRecordsOpened, setReactionsRecordsOpened] = useState(false);
 
-  useRecentPicksPersistence({
-    initialization: async () => {
-      const item = await AsyncStorage.getItem(STORAGE_KEY);
-      return JSON.parse(item || '[]');
-    },
-    onStateChange: (next) =>
-      AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(next)),
-  });
+  // useRecentPicksPersistence({
+  //   initialization: async () => {
+  //     const item = await AsyncStorage.getItem(STORAGE_KEY);
+  //     return JSON.parse(item || '[]');
+  //   },
+  //   onStateChange: (next) =>
+  //     AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(next)),
+  // });
 
   const groupedReactions: ReactionGroupType[] = useMemo(() => {
     const groupedReactionsObj = reactions.reduce(
@@ -161,11 +163,14 @@ export default function Reactions({
         onClose={() => setReactionsRecordsOpened(false)}
         onOpenUserProfile={onOpenUserProfile}
         theme={reactionsRecordsTheme}
-        reactionsRecordsEnableGroupChangeAnimation={
-          reactionsRecordsEnableGroupChangeAnimation
-        }
+        styles={reactionsRecordsStyles}
+        enableGroupChangeAnimation={reactionsRecordsEnableGroupChangeAnimation}
       />
-      {cloneElement(
+      <EmojiPicker
+        open={emojiPickerOpened}
+        onClose={() => setEmojiPickerOpened(false)}
+      />
+      {/* {cloneElement(
         <EmojiPicker
           open={emojiPickerOpened}
           onClose={() => setEmojiPickerOpened(false)}
@@ -195,7 +200,7 @@ export default function Reactions({
             ? { translation: emojiPickerTranslation }
             : {}),
         }
-      )}
+      )} */}
     </>
   );
 }

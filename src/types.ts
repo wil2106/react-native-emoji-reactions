@@ -15,7 +15,7 @@ export type ReactionsProps = {
 
   reactionsRecordsTheme?: ReactionsRecordsTheme;
   reactionsRecordsEnableGroupChangeAnimation?: boolean;
-  reactionsrecordsStyles?: ReactionsRecordsStyles;
+  reactionsRecordsStyles?: ReactionsRecordsStyles;
 
   emojiPickerTheme?: EmojiPickerTheme;
   emojiPickerStyles?: EmojiPickerStyles;
@@ -56,7 +56,14 @@ export type ReactionsRecordsProps = {
   onOpenUserProfile?: (id: string | number) => void;
   theme?: ReactionsRecordsTheme;
   styles?: ReactionsRecordsStyles;
-  reactionsRecordsEnableGroupChangeAnimation?: boolean;
+  enableGroupChangeAnimation?: boolean;
+};
+
+export type EmojiPickerProps = {
+  open: boolean;
+  onClose: () => void;
+  theme?: EmojiPickerTheme;
+  styles?: EmojiPickerStyles;
 };
 
 export type ReactionGroupType = {
