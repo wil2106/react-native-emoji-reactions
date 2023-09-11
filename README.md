@@ -22,6 +22,10 @@ expo install react-native-reanimated react-native-gesture-handler
 ```
 ## ⚡️ Example
 
+
+https://github.com/wil2106/react-native-emoji-reactions/assets/25795688/bde67183-a7bc-4027-b2ce-bea32c4e4559
+
+
 [Example](/example/src/App.tsx)
 
 ## 📖 Documentation
