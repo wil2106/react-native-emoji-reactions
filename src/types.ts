@@ -1,6 +1,26 @@
 import type { ImageStyle } from 'expo-image';
 import type { ViewStyle, TextStyle } from 'react-native';
 
+export const CATEGORIES_NAVIGATION = [
+  { icon: 'Smile', category: 'smileys_emotion' },
+  { icon: 'Users', category: 'people_body' },
+  { icon: 'Trees', category: 'animals_nature' },
+  { icon: 'Pizza', category: 'food_drink' },
+  { icon: 'Plane', category: 'travel_places' },
+  { icon: 'Football', category: 'activities' },
+  { icon: 'Lightbulb', category: 'objects' },
+  { icon: 'Ban', category: 'symbols' },
+  { icon: 'Flag', category: 'flags' },
+  { icon: 'Clock', category: 'recently_used' },
+  { icon: 'Search', category: 'search' },
+] as const;
+
+export type IconNames = (typeof CATEGORIES_NAVIGATION)[number]['icon'];
+export type CategoryTypes = (typeof CATEGORIES_NAVIGATION)[number]['category'];
+
+export type TranslationListType = { [key: string]: string };
+export type TranslationsType = { [code: string]: TranslationListType };
+
 export type ReactionsProps = {
   currentUserId: string | number;
   reactions: ReactionType[];
@@ -69,23 +89,6 @@ export type ReactionGroupType = {
   currentUserInIt: boolean;
   emoji: string;
 };
-
-export const CATEGORIES_NAVIGATION = [
-  { icon: 'Smile', category: 'smileys_emotion' },
-  { icon: 'Users', category: 'people_body' },
-  { icon: 'Trees', category: 'animals_nature' },
-  { icon: 'Pizza', category: 'food_drink' },
-  { icon: 'Plane', category: 'travel_places' },
-  { icon: 'Football', category: 'activities' },
-  { icon: 'Lightbulb', category: 'objects' },
-  { icon: 'Ban', category: 'symbols' },
-  { icon: 'Flag', category: 'flags' },
-  { icon: 'Clock', category: 'recently_used' },
-  { icon: 'Search', category: 'search' },
-] as const;
-
-export type IconNames = (typeof CATEGORIES_NAVIGATION)[number]['icon'];
-export type CategoryTypes = (typeof CATEGORIES_NAVIGATION)[number]['category'];
 
 export type ReactionsTheme = {
   reactionButton?: ReactionButtonTheme;
@@ -267,7 +270,3 @@ export type JsonEmoji = {
   unicode_version: string;
   skin_tone_support: boolean;
 };
-
-export type TranslationListType = { [key: string]: string };
-
-export type TranslationsType = { [code: string]: TranslationListType };
