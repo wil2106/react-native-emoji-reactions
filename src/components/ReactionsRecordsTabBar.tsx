@@ -92,11 +92,19 @@ export default function ReactionsRecordsTabBar({
           >
             <Text
               style={[
-                defaultStyles.reactionsGroupTitle,
+                defaultStyles.reactionsGroupEmojiText,
+                styles?.reactionsGroupEmojiText,
+              ]}
+            >
+              {reactionsgroup.emoji}
+            </Text>
+            <Text
+              style={[
+                defaultStyles.reactionsGroupCountText,
                 index === selectedGroupIndex
                   ? defaultStyles?.activeHeaderGroupText
                   : defaultStyles?.inactiveHeaderGroupText,
-                styles?.reactionsGroupTitle,
+                styles?.reactionsGroupCountText,
                 index === selectedGroupIndex && theme?.activeHeaderGroupText
                   ? { color: theme.activeHeaderGroupText }
                   : {},
@@ -105,7 +113,7 @@ export default function ReactionsRecordsTabBar({
                   : {},
               ]}
             >
-              {reactionsgroup.emoji} {reactionsgroup.reactions.length}
+              {reactionsgroup.reactions.length}
             </Text>
           </Pressable>
         ))}
@@ -139,8 +147,12 @@ const defaultStyles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
     paddingVertical: 10,
+    gap: 5,
   },
-  reactionsGroupTitle: {
+  reactionsGroupEmojiText: {
+    fontSize: 14,
+  },
+  reactionsGroupCountText: {
     fontSize: 12,
     fontWeight: '600',
   },

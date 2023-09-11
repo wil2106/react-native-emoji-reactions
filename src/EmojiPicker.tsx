@@ -1,8 +1,6 @@
 import {
-  BottomSheetFooter,
   BottomSheetModal,
   BottomSheetModalProvider,
-  BottomSheetScrollView,
   BottomSheetVirtualizedList,
 } from '@gorhom/bottom-sheet';
 import React, {
@@ -12,31 +10,78 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import { Dimensions, ScrollView, StyleSheet } from 'react-native';
-import CustomBackdrop from './components/CustomBackdrop';
-import type { EmojiPickerProps } from './types';
-import { Modal } from 'react-native';
+import { Dimensions, Modal, StyleSheet } from 'react-native';
 import emojisByCategory from 'unicode-emoji-json/data-by-group.json';
-import { View } from 'react-native';
+import emojis from 'unicode-emoji-json/data-by-emoji.json';
+import CustomBackdrop from './components/CustomBackdrop';
+import EmojiPickerListRow, {
+  DEFAULT_EMOJI_CELL_HEIGHT,
+  DEFAULT_EMOJI_CELL_WIDTH,
+} from './components/EmojiPickerListRow';
+import {
+  ICON_CONTAINER_PADDING,
+  ICON_SIZE,
+  TABBAR_BOTTOM_SPACE,
+} from './components/EmojiPickerTabBar';
+import EmojiPickerTabBarFooter from './components/EmojiPickerTabBarFooter';
+import { CATEGORIES_KEYS, MAX_RECENT_EMOJIS } from './constants';
+import { EmojiPickerTabBarContext } from './context';
+import type { EmojiPickerProps, JsonEmoji } from './types';
 import { Text } from 'react-native';
+import { View } from 'react-native';
+import { EmojiPickerSearchBar } from './components/EmojiPickerSearchBar';
 import { TouchableOpacity } from 'react-native';
-import EmojiPickerTabBar from './components/EmojiPickerTabBar';
-import { CATEGORIES_KEYS } from './constants';
+import { Keyboard } from 'react-native';
+import {
+  EMOJI_PICKER_SEARCH_RESULT_ROW_HEIGHT,
+  EmojiPickerSearchResultsRow,
+} from './components/EmojiPickerSearchResultsRow';
+import { t } from './translation';
+import {
+  getRecentEmojisFromLocalStorage,
+  setRecentEmojisInLocalStorage,
+} from './utils';
 
 const DEVICE_WIDTH = Dimensions.get('window').width;
-const DEFAULT_EMOJI_CELL_WIDTH = 50;
-const DEFAULT_EMOJI_CELL_HEIGHT = 50;
 
-export default function EmojiPicker({ open, onClose }: EmojiPickerProps) {
+export default function EmojiPicker({
+  open,
+  onClose,
+  onSelectEmoji,
+  disableSearch,
+  disableRecentlyUsed,
+  language,
+  newTranslations,
+  theme,
+  styles,
+}: EmojiPickerProps) {
   const snapPoints = useMemo(() => ['45%', '95%'], []);
   const bottomSheetRef = useRef<BottomSheetModal>(null);
-  const scrollViewRef = useRef<ScrollView>(null);
   const [currentCategoryIndex, setCurrentCategoryIndex] = useState(0);
+  const [search, setSearch] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
+  const [searchMode, setSearchMode] = useState(false);
+  const [recentEmojis, setRecentEmojis] = useState<JsonEmoji[]>([]);
+
+  useEffect(() => {
+    if (disableRecentlyUsed) {
+      return;
+    }
+    (async () => {
+      const lsRecentEmojis = await getRecentEmojisFromLocalStorage();
+      setRecentEmojis(lsRecentEmojis);
+    })();
+  }, [disableRecentlyUsed]);
 
   useEffect(() => {
     if (open) {
       // open bottom sheet
       bottomSheetRef.current?.present();
+    } else {
+      setCurrentCategoryIndex(0);
+      setSearch('');
+      setDebouncedSearch('');
+      setSearchMode(false);
     }
   }, [open]);
 
@@ -47,16 +92,16 @@ export default function EmojiPicker({ open, onClose }: EmojiPickerProps) {
 
   const emojiRowsByCategory = useMemo(() => {
     let theEmojiRowsByCategory = [];
-    for (const [category, emojis] of Object.entries(emojisByCategory)) {
+    for (const [category, categoryEmojis] of Object.entries(emojisByCategory)) {
       if (category === 'default') continue;
       let theEmojiRows = [];
       let emojiRow = [];
-      for (let i = 0; i < emojis.length; i++) {
+      for (let i = 0; i < categoryEmojis.length; i++) {
         if (i !== 0 && i % nbEmojisPerRow === 0) {
           theEmojiRows.push(emojiRow);
           emojiRow = [];
         }
-        const emoji = emojis[i];
+        const emoji = categoryEmojis[i];
         emojiRow.push(emoji);
       }
       //add remaining emojis
@@ -68,117 +113,333 @@ export default function EmojiPicker({ open, onClose }: EmojiPickerProps) {
         }
         theEmojiRows.push(emojiRow);
       }
+      const key = CATEGORIES_KEYS[category] ?? 'unknown';
       theEmojiRowsByCategory.push({
-        category: CATEGORIES_KEYS[category] ?? 'unknown',
+        key: key,
+        name: t(key, language, newTranslations, category),
         emojiRows: theEmojiRows,
       });
     }
     return theEmojiRowsByCategory;
-  }, [nbEmojisPerRow]);
+  }, [nbEmojisPerRow, language, newTranslations]);
 
-  const onSelectCategory = (index: number) => {
-    setCurrentCategoryIndex(index);
-    scrollViewRef.current?.scrollTo({
-      x: DEVICE_WIDTH * index,
-      animated: false,
-    });
-  };
+  const recentEmojiRowsCategory = useMemo(() => {
+    let theRecentEmojiRows = [];
+    let emojiRow = [];
+    for (let i = 0; i < recentEmojis.length; i++) {
+      if (i !== 0 && i % nbEmojisPerRow === 0) {
+        theRecentEmojiRows.push(emojiRow);
+        emojiRow = [];
+      }
+      const emoji = recentEmojis[i];
+      emojiRow.push(emoji);
+    }
+    //add remaining emojis
+    if (emojiRow.length > 0) {
+      // fill array with empty items
+      const lastRowEmojisCount = emojiRow.length;
+      for (let a = lastRowEmojisCount; a < nbEmojisPerRow; a++) {
+        emojiRow.push(null);
+      }
+      theRecentEmojiRows.push(emojiRow);
+    }
+    return {
+      key: 'recently_used',
+      name: t('recently_used', language, newTranslations, 'Recently used'),
+      emojiRows: theRecentEmojiRows,
+    };
+  }, [nbEmojisPerRow, recentEmojis, language, newTranslations]);
 
-  const renderItem = useCallback(
-    ({ item }) => (
-      <View style={defaultStyles.emojiRowContainer}>
-        {item.map(
-          (
-            emoji:
-              | {
-                  emoji: string;
-                  skin_tone_support: boolean;
-                  name: string;
-                  slug: string;
-                  unicode_version: string;
-                  emoji_version: string;
-                }
-              | null
-              | undefined,
-            index: number
-          ) => (
-            <>
-              {emoji !== null && emoji !== undefined ? (
-                <TouchableOpacity
-                  style={defaultStyles.emojiContainer}
-                  key={`${emoji.slug}-${index}`}
-                >
-                  <Text style={defaultStyles.emojiText}>{emoji.emoji}</Text>
-                </TouchableOpacity>
-              ) : (
-                <View
-                  key={`empty-${index}`}
-                  style={defaultStyles.emojiContainer}
-                />
-              )}
-            </>
-          )
-        )}
-      </View>
-    ),
-    []
+  const finalEmojiRowsByCategory = useMemo(() => {
+    return [
+      ...(recentEmojiRowsCategory.emojiRows.length > 0
+        ? [recentEmojiRowsCategory]
+        : []),
+      ...emojiRowsByCategory,
+    ];
+  }, [emojiRowsByCategory, recentEmojiRowsCategory]);
+
+  const searchedEmojis = useMemo(() => {
+    if (debouncedSearch.trim().length === 0) {
+      return [];
+    }
+    let theSearchedEmojis = [];
+    for (const [emoji, emojiData] of Object.entries(emojis)) {
+      const translatedName = t(
+        emojiData.slug,
+        language,
+        newTranslations,
+        emojiData.name
+      );
+      if (
+        translatedName
+          .toLowerCase()
+          .includes(debouncedSearch.trim().toLowerCase())
+      ) {
+        theSearchedEmojis.push({ ...emojiData, emoji, name: translatedName });
+      }
+    }
+    return theSearchedEmojis;
+  }, [debouncedSearch, language, newTranslations]);
+
+  const currentCategory = useMemo(
+    () =>
+      finalEmojiRowsByCategory[currentCategoryIndex] ?? {
+        key: 'unknown',
+        name: 'unknown',
+        emojiRows: [],
+      },
+    [finalEmojiRowsByCategory, currentCategoryIndex]
   );
 
-  // const renderItem = useCallback(({ item }) => {
-  //   return <Text>ok</Text>;
-  // }, []);
+  const categories = useMemo(
+    () => finalEmojiRowsByCategory.map((cat) => cat.key),
+    [finalEmojiRowsByCategory]
+  );
+
+  const translatedRecentEmojis = useMemo(
+    () =>
+      recentEmojis.map((emo) => ({
+        ...emo,
+        name: t(emo.slug, language, newTranslations, emo.name),
+      })),
+    [recentEmojis, language, newTranslations]
+  );
+
+  const onChooseEmoji = useCallback(
+    (emoji: JsonEmoji) => {
+      if (!emoji.emoji) {
+        return;
+      }
+      bottomSheetRef.current?.close();
+      onSelectEmoji(emoji.emoji);
+      // add on top, remove duplicates, limit to MAX_RECENT_EMOJIS
+      const newRecentEmojis = [
+        emoji,
+        ...recentEmojis.filter((emj: JsonEmoji) => emj.slug !== emoji.slug),
+      ].slice(0, MAX_RECENT_EMOJIS);
+      setRecentEmojis(newRecentEmojis);
+      setRecentEmojisInLocalStorage(newRecentEmojis);
+    },
+    [onSelectEmoji, recentEmojis]
+  );
+
+  const renderEmojiPickerListRow = useCallback(
+    ({ item }) => (
+      <EmojiPickerListRow
+        item={item}
+        onChooseEmoji={onChooseEmoji}
+        theme={theme?.listRow}
+        styles={styles?.listRow}
+      />
+    ),
+    [onChooseEmoji, theme, styles]
+  );
+
+  const renderEmojiPickerSearchResultsRow = useCallback(
+    ({ item }) => (
+      <EmojiPickerSearchResultsRow
+        emoji={item}
+        onPress={() => onChooseEmoji(item)}
+        theme={theme?.searchResultsRow}
+        styles={styles?.searchResultsRow}
+      />
+    ),
+    [onChooseEmoji, theme, styles]
+  );
+
+  const renderEmptySearchComponent = () => {
+    return searchedEmojis.length === 0 && debouncedSearch.trim().length > 0 ? (
+      <Text
+        style={[
+          defaultStyles.searchEmptyText,
+          styles?.searchEmptyText,
+          theme?.searchEmptyText
+            ? {
+                color: theme.searchEmptyText,
+              }
+            : {},
+        ]}
+      >
+        {t('search_results_empty', language, newTranslations, undefined, {
+          value: search,
+        })}
+      </Text>
+    ) : (
+      <></>
+    );
+  };
+
+  const onCancelSearch = () => {
+    setSearchMode(false);
+    setSearch('');
+    setDebouncedSearch('');
+    Keyboard.dismiss();
+    bottomSheetRef.current?.snapToIndex(1);
+  };
 
   return (
-    <Modal transparent={true} visible={open}>
-      <BottomSheetModalProvider>
-        <BottomSheetModal
-          ref={bottomSheetRef}
-          index={0}
-          snapPoints={snapPoints}
-          backdropComponent={CustomBackdrop}
-          enablePanDownToClose={true}
-          onDismiss={onClose}
-          footerComponent={({ animatedFooterPosition }) => (
-            <BottomSheetFooter animatedFooterPosition={animatedFooterPosition}>
-              <EmojiPickerTabBar
-                selectedIndex={currentCategoryIndex}
-                setSelectedIndex={onSelectCategory}
-                categories={emojiRowsByCategory.map((cat) => cat.category)}
-              />
-            </BottomSheetFooter>
-          )}
-        >
-          <ScrollView
-            ref={scrollViewRef}
-            showsHorizontalScrollIndicator={false}
-            horizontal={true}
-            snapToInterval={DEVICE_WIDTH}
-            decelerationRate={0}
-            snapToAlignment="start"
+    <EmojiPickerTabBarContext.Provider
+      value={{
+        categories,
+        currentCategoryIndex,
+        setCurrentCategoryIndex,
+        theme: theme?.tabBar,
+        styles: styles?.tabBar,
+      }}
+    >
+      <Modal transparent={true} visible={open}>
+        <BottomSheetModalProvider>
+          <BottomSheetModal
+            ref={bottomSheetRef}
+            index={0}
+            snapPoints={snapPoints}
+            backdropComponent={CustomBackdrop}
+            enablePanDownToClose={true}
+            onDismiss={onClose}
+            footerComponent={searchMode ? undefined : EmojiPickerTabBarFooter}
+            handleIndicatorStyle={[
+              styles?.knob,
+              theme?.knob
+                ? {
+                    backgroundColor: theme.knob,
+                  }
+                : {},
+            ]}
+            backgroundStyle={[
+              defaultStyles.background,
+              theme?.background
+                ? {
+                    backgroundColor: theme.background,
+                  }
+                : {},
+            ]}
           >
-            {emojiRowsByCategory.map((category, index) => (
+            {!disableSearch && (
+              <View
+                style={[
+                  defaultStyles.searchContainer,
+                  styles?.searchContainer,
+                  theme?.searchContainerBackground
+                    ? {
+                        backgroundColor: theme.searchContainerBackground,
+                      }
+                    : {},
+                  theme?.divider
+                    ? {
+                        borderColor: theme.divider,
+                      }
+                    : {},
+                ]}
+              >
+                <EmojiPickerSearchBar
+                  value={search}
+                  onChangeText={setSearch}
+                  onDebounceChangeText={setDebouncedSearch}
+                  placeholder={t(
+                    'search_placeholder',
+                    language,
+                    newTranslations
+                  )}
+                  onFocus={() => setSearchMode(true)}
+                  theme={theme?.searchBar}
+                  styles={styles?.searchBar}
+                />
+                {searchMode && (
+                  <TouchableOpacity onPress={onCancelSearch}>
+                    <Text
+                      style={[
+                        defaultStyles.cancelSearchText,
+                        styles?.cancelSearchText,
+                        theme?.cancelSearchText
+                          ? {
+                              color: theme.cancelSearchText,
+                            }
+                          : {},
+                      ]}
+                      numberOfLines={1}
+                    >
+                      {t('cancel', language, newTranslations, 'Cancel')}
+                    </Text>
+                  </TouchableOpacity>
+                )}
+              </View>
+            )}
+            {searchMode ? (
               <BottomSheetVirtualizedList
-                key={`${category.category}-${index}`}
-                data={category.emojiRows}
-                keyExtractor={(_, rowIndex) =>
-                  `${category.category}-row-${rowIndex}`
+                data={
+                  search.trim().length > 0
+                    ? searchedEmojis
+                    : translatedRecentEmojis
                 }
+                ListHeaderComponent={renderEmptySearchComponent}
+                keyExtractor={(emoji: JsonEmoji) => emoji.slug}
                 getItemCount={(data) => data.length}
                 getItem={(data, rowIndex) => data[rowIndex]}
-                renderItem={renderItem}
+                renderItem={renderEmojiPickerSearchResultsRow}
                 style={{ width: DEVICE_WIDTH }}
-                contentContainerStyle={defaultStyles.listContainer}
+                contentContainerStyle={[
+                  defaultStyles.searchListContainer,
+                  styles?.searchListContainer,
+                  theme?.searchListContainerBackground
+                    ? {
+                        backgroundColor: theme.searchListContainerBackground,
+                      }
+                    : {},
+                ]}
                 getItemLayout={(_, rowIndex) => ({
-                  length: DEFAULT_EMOJI_CELL_HEIGHT,
-                  offset: DEFAULT_EMOJI_CELL_HEIGHT * index,
+                  length: EMOJI_PICKER_SEARCH_RESULT_ROW_HEIGHT,
+                  offset: EMOJI_PICKER_SEARCH_RESULT_ROW_HEIGHT * rowIndex,
                   index: rowIndex,
                 })}
               />
-            ))}
-          </ScrollView>
-        </BottomSheetModal>
-      </BottomSheetModalProvider>
-    </Modal>
+            ) : (
+              <>
+                <View style={defaultStyles.titleContainer}>
+                  <Text
+                    style={[
+                      defaultStyles.titleText,
+                      styles?.titleText,
+                      theme?.titleText
+                        ? {
+                            color: theme.titleText,
+                          }
+                        : {},
+                    ]}
+                  >
+                    {currentCategory.name}
+                  </Text>
+                </View>
+                <BottomSheetVirtualizedList
+                  data={currentCategory.emojiRows}
+                  keyExtractor={(_, rowIndex) =>
+                    `${currentCategory.key}-row-${rowIndex}`
+                  }
+                  getItemCount={(data) => data.length}
+                  getItem={(data, rowIndex) => data[rowIndex]}
+                  renderItem={renderEmojiPickerListRow}
+                  style={{ width: DEVICE_WIDTH }}
+                  contentContainerStyle={[
+                    defaultStyles.listContainer,
+                    styles?.listContainer,
+                    theme?.listContainerBackground
+                      ? {
+                          backgroundColor: theme.listContainerBackground,
+                        }
+                      : {},
+                  ]}
+                  getItemLayout={(_, rowIndex) => ({
+                    length: DEFAULT_EMOJI_CELL_HEIGHT,
+                    offset: DEFAULT_EMOJI_CELL_HEIGHT * rowIndex,
+                    index: rowIndex,
+                  })}
+                />
+              </>
+            )}
+          </BottomSheetModal>
+        </BottomSheetModalProvider>
+      </Modal>
+    </EmojiPickerTabBarContext.Provider>
   );
 }
 
@@ -191,18 +452,35 @@ const defaultStyles = StyleSheet.create({
   },
   listContainer: {
     alignItems: 'center',
+    paddingBottom: TABBAR_BOTTOM_SPACE + ICON_SIZE + ICON_CONTAINER_PADDING * 2,
   },
-  emojiRowContainer: {
-    flexDirection: 'row',
+  searchListContainer: {},
+  titleContainer: {
+    paddingVertical: 4,
+    paddingHorizontal: 15,
   },
-  emojiContainer: {
+  titleText: {
+    fontSize: 16,
+    color: '#5F5F5F',
+  },
+  searchContainer: {
     flexDirection: 'row',
-    justifyContent: 'center',
     alignItems: 'center',
-    width: DEFAULT_EMOJI_CELL_WIDTH,
-    height: DEFAULT_EMOJI_CELL_HEIGHT,
+    gap: 10,
+    paddingBottom: 10,
+    paddingHorizontal: 15,
+    borderBottomWidth: 1,
+    borderColor: '#DDDDDD',
   },
-  emojiText: {
-    fontSize: 22,
+  cancelSearchText: {
+    fontWeight: '600',
+    alignSelf: 'center',
+    color: '#1C1C1C',
+  },
+  searchEmptyText: {
+    fontSize: 14,
+    color: '#868686',
+    alignSelf: 'center',
+    marginTop: 20,
   },
 });

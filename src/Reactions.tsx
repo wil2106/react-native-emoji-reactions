@@ -1,16 +1,11 @@
-import React, { cloneElement, useCallback, useMemo, useState } from 'react';
-//import EmojiPicker, { useRecentPicksPersistence } from 'rn-emoji-keyboard';
-import type { ReactionGroupType, ReactionsProps } from './types';
-import { View } from 'react-native';
-import { StyleSheet } from 'react-native';
-import ReactionButton from './components/ReactionButton';
-import AddReactionButton from './components/AddReactionButton';
-import ReactionsRecords from './ReactionsRecords';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import React, { useCallback, useMemo, useState } from 'react';
 import * as Haptics from 'expo-haptics';
+import { StyleSheet, View } from 'react-native';
 import EmojiPicker from './EmojiPicker';
-
-const STORAGE_KEY = 'REACT-NATIVE-EMOJI-REACTIONS_RECENT';
+import ReactionsRecords from './ReactionsRecords';
+import AddReactionButton from './components/AddReactionButton';
+import ReactionButton from './components/ReactionButton';
+import type { ReactionGroupType, ReactionsProps } from './types';
 
 export default function Reactions({
   currentUserId,
@@ -20,32 +15,13 @@ export default function Reactions({
   onRemoveReaction,
   onOpenUserProfile,
   disableHaptics,
-
-  reactionsTheme,
-  reactionsStyles,
-
-  reactionsRecordsTheme,
-  reactionsRecordsStyles,
+  language,
+  newTranslations,
   reactionsRecordsEnableGroupChangeAnimation = true,
-
-  emojiPickerTheme,
-  emojiPickerStyles,
-  emojiPickerEmojiSize,
-  emojiPickerExpandable,
-  emojiPickerHideHeader,
-  emojiPickerDefaultHeight,
-  emojiPickerExpandedHeight,
-  emojiPickerTranslation,
-  emojiPickerDisabledCategories,
-  emojiPickerEnableRecentlyUsed = true,
-  emojiPickerCategoryPosition,
-  emojiPickerEnableSearchBar = true,
-  emojiPickerCategoryOrder,
-  emojiPickerDisableSafeArea,
-  emojiPickerEnableSearchAnimation,
-  emojiPickerEnableCategoryChangeAnimation,
-  emojiPickerEnableCategoryChangeGesture,
-  emojiPickerEmojisByCategory,
+  emojiPickerDisableSearch,
+  emojiPickerDisableRecentlyUsed,
+  theme,
+  styles,
 }: ReactionsProps) {
   const [emojiPickerOpened, setEmojiPickerOpened] = useState(false);
   const [reactionsRecordsOpened, setReactionsRecordsOpened] = useState(false);
@@ -122,19 +98,23 @@ export default function Reactions({
   const onSelectEmoji = (emoji: string) => {
     // check if not already added
     if (
-      !reactions.some(
+      reactions.some(
         (reaction) =>
           reaction.user.id === currentUserId && reaction.emoji === emoji
       )
     ) {
-      onAddReaction(emoji);
+      return;
     }
+    if (!disableHaptics) {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    }
+    onAddReaction(emoji);
   };
 
   return (
     <>
       <View
-        style={{ ...defaultStyles.container, ...reactionsStyles?.container }}
+        style={{ ...defaultStyles.container, ...styles?.reactions?.container }}
       >
         {groupedReactions.map((reactionGroup, index) => (
           <ReactionButton
@@ -144,16 +124,16 @@ export default function Reactions({
             onPress={() => onPressButtonChip(reactionGroup)}
             count={reactionGroup.reactions.length}
             onLongPress={onLongPress}
-            theme={reactionsTheme?.reactionButton}
-            styles={reactionsStyles?.reactionButton}
+            theme={theme?.reactions?.reactionButton}
+            styles={styles?.reactions?.reactionButton}
           />
         ))}
         {!hideAddButton && (
           <AddReactionButton
             onPress={onPressAdd}
             onLongPress={onLongPress}
-            theme={reactionsTheme?.addReactionButton}
-            styles={reactionsStyles?.addReactionButton}
+            theme={theme?.reactions?.addReactionButton}
+            styles={styles?.reactions?.addReactionButton}
           />
         )}
       </View>
@@ -162,45 +142,21 @@ export default function Reactions({
         reactionsGroups={groupedReactions}
         onClose={() => setReactionsRecordsOpened(false)}
         onOpenUserProfile={onOpenUserProfile}
-        theme={reactionsRecordsTheme}
-        styles={reactionsRecordsStyles}
+        theme={theme?.reactionsRecords}
+        styles={styles?.reactionsRecords}
         enableGroupChangeAnimation={reactionsRecordsEnableGroupChangeAnimation}
       />
       <EmojiPicker
         open={emojiPickerOpened}
         onClose={() => setEmojiPickerOpened(false)}
+        onSelectEmoji={onSelectEmoji}
+        disableSearch={emojiPickerDisableSearch}
+        disableRecentlyUsed={emojiPickerDisableRecentlyUsed}
+        language={language}
+        newTranslations={newTranslations}
+        theme={theme?.emojiPicker}
+        styles={styles?.emojiPicker}
       />
-      {/* {cloneElement(
-        <EmojiPicker
-          open={emojiPickerOpened}
-          onClose={() => setEmojiPickerOpened(false)}
-          onEmojiSelected={(emo) => onSelectEmoji(emo.emoji)}
-          emojiSize={emojiPickerEmojiSize ?? 28}
-          expandable={emojiPickerExpandable ?? true}
-          hideHeader={emojiPickerHideHeader}
-          defaultHeight={emojiPickerDefaultHeight}
-          expandedHeight={emojiPickerExpandedHeight ?? '80%'}
-          disabledCategories={emojiPickerDisabledCategories}
-          enableRecentlyUsed={emojiPickerEnableRecentlyUsed}
-          categoryPosition={emojiPickerCategoryPosition ?? 'floating'}
-          enableSearchBar={emojiPickerEnableSearchBar ?? false}
-          categoryOrder={emojiPickerCategoryOrder}
-          disableSafeArea={emojiPickerDisableSafeArea}
-          theme={emojiPickerTheme}
-          styles={emojiPickerStyles}
-          enableSearchAnimation={emojiPickerEnableSearchAnimation}
-          enableCategoryChangeAnimation={
-            emojiPickerEnableCategoryChangeAnimation
-          }
-          enableCategoryChangeGesture={emojiPickerEnableCategoryChangeGesture}
-          emojisByCategory={emojiPickerEmojisByCategory}
-        />,
-        {
-          ...(emojiPickerTranslation
-            ? { translation: emojiPickerTranslation }
-            : {}),
-        }
-      )} */}
     </>
   );
 }

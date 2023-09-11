@@ -28,3 +28,6 @@ export const CATEGORIES_KEYS: { [category: string]: string } = {
   'Symbols': 'symbols',
   'Flags': 'flags',
 };
+
+export const STORAGE_KEY = 'RN-EMOJI-REACTIONS_RECENT';
+export const MAX_RECENT_EMOJIS = 20;

@@ -9,32 +9,25 @@ export type ReactionsProps = {
   onRemoveReaction: (reactionId: string | number) => void;
   onOpenUserProfile?: (userId: string | number) => void;
   disableHaptics?: boolean;
-
-  reactionsTheme?: ReactionsTheme;
-  reactionsStyles?: ReactionsStyles;
-
-  reactionsRecordsTheme?: ReactionsRecordsTheme;
+  language?: string;
+  newTranslations?: TranslationsType;
   reactionsRecordsEnableGroupChangeAnimation?: boolean;
-  reactionsRecordsStyles?: ReactionsRecordsStyles;
+  emojiPickerDisableSearch?: boolean;
+  emojiPickerDisableRecentlyUsed?: boolean;
+  theme?: Theme;
+  styles?: Styles;
+};
 
-  emojiPickerTheme?: EmojiPickerTheme;
-  emojiPickerStyles?: EmojiPickerStyles;
-  emojiPickerEmojiSize?: number;
-  emojiPickerExpandable?: boolean;
-  emojiPickerHideHeader?: boolean;
-  emojiPickerDefaultHeight?: number | string;
-  emojiPickerExpandedHeight?: number | string;
-  emojiPickerTranslation?: CategoryTranslation;
-  emojiPickerDisabledCategories?: CategoryTypes[];
-  emojiPickerEnableRecentlyUsed?: boolean;
-  emojiPickerCategoryPosition?: CategoryPosition;
-  emojiPickerEnableSearchBar?: boolean;
-  emojiPickerCategoryOrder?: CategoryTypes[];
-  emojiPickerDisableSafeArea?: boolean;
-  emojiPickerEnableSearchAnimation?: boolean;
-  emojiPickerEnableCategoryChangeAnimation?: boolean;
-  emojiPickerEnableCategoryChangeGesture?: boolean;
-  emojiPickerEmojisByCategory?: EmojisByCategory[];
+export type Theme = {
+  reactions?: ReactionsTheme;
+  reactionsRecords?: ReactionsRecordsTheme;
+  emojiPicker?: EmojiPickerTheme;
+};
+
+export type Styles = {
+  reactions?: ReactionsStyles;
+  reactionsRecords?: ReactionsRecordsStyles;
+  emojiPicker?: EmojiPickerStyles;
 };
 
 export type ReactionType = {
@@ -62,6 +55,11 @@ export type ReactionsRecordsProps = {
 export type EmojiPickerProps = {
   open: boolean;
   onClose: () => void;
+  onSelectEmoji: (emoji: string) => void;
+  disableSearch?: boolean;
+  disableRecentlyUsed?: boolean;
+  language?: string;
+  newTranslations?: TranslationsType;
   theme?: EmojiPickerTheme;
   styles?: EmojiPickerStyles;
 };
@@ -88,14 +86,6 @@ export const CATEGORIES_NAVIGATION = [
 
 export type IconNames = (typeof CATEGORIES_NAVIGATION)[number]['icon'];
 export type CategoryTypes = (typeof CATEGORIES_NAVIGATION)[number]['category'];
-
-export type OnEmojiSelected = (emoji: string) => void;
-
-export type CategoryTranslation = {
-  [key in CategoryTypes]: string;
-};
-
-export type CategoryPosition = 'floating' | 'top' | 'bottom';
 
 export type ReactionsTheme = {
   reactionButton?: ReactionButtonTheme;
@@ -138,26 +128,45 @@ export type AddReactionButtonTheme = {
 };
 
 export type EmojiPickerTheme = {
-  backdrop?: string;
+  background?: string;
   knob?: string;
-  container?: string;
-  header?: string;
-  skinTonesContainer?: string;
-  category?: {
-    icon?: string;
-    iconActive?: string;
-    container?: string;
-    containerActive?: string;
-  };
-  search?: {
-    background?: string;
-    text?: string;
-    placeholder?: string;
-    icon?: string;
-  };
-  emoji?: {
-    selected?: string;
-  };
+  divider?: string;
+  listContainerBackground?: string;
+  searchListContainerBackground?: string;
+  titleText?: string;
+  searchContainerBackground?: string;
+  cancelSearchText?: string;
+  searchEmptyText?: string;
+  listRow: EmojiPickerListRowTheme;
+  searchBar: EmojiPickerSearchBarTheme;
+  searchResultsRow: EmojiPickerSearchResultsRowTheme;
+  tabBar: EmojiPickerTabBarTheme;
+};
+
+export type EmojiPickerListRowTheme = {
+  emojiRowContainerBackground?: string;
+  emojiContainerBackground?: string;
+};
+
+export type EmojiPickerSearchBarTheme = {
+  searchIcon?: string;
+  clearIcon?: string;
+  searchInputContainerBackground?: string;
+  searchInputText?: string;
+  searchInputPlaceholderText?: string;
+};
+
+export type EmojiPickerSearchResultsRowTheme = {
+  rowContainerBackground?: string;
+  nameText?: string;
+};
+
+export type EmojiPickerTabBarTheme = {
+  tabBarBackground?: string;
+  activeIcon?: string;
+  inactiveIcon?: string;
+  divider?: string;
+  selectedItemBackgroundBack?: string;
 };
 
 export type ReactionsStyles = {
@@ -187,7 +196,8 @@ export type ReactionsRecordsStyles = {
 export type ReactionsRecordsTabBarStyles = {
   divider?: ViewStyle;
   reactionsGroupContainer?: ViewStyle;
-  reactionsGroupTitle?: TextStyle;
+  reactionsGroupEmojiText?: TextStyle;
+  reactionsGroupCountText?: TextStyle;
   activeIndexBar?: ViewStyle;
 };
 
@@ -204,31 +214,60 @@ export type AvatarStyles = {
 };
 
 export type EmojiPickerStyles = {
-  container?: ViewStyle;
-  header?: TextStyle;
+  background?: ViewStyle;
   knob?: ViewStyle;
-  category?: {
-    container?: ViewStyle;
-    icon?: TextStyle;
-  };
-  searchBar?: {
-    container?: ViewStyle;
-    text?: TextStyle;
-  };
-  emoji?: {
-    selected?: ViewStyle;
-  };
+  listContainer?: ViewStyle;
+  searchListContainer?: ViewStyle;
+  titleText?: TextStyle;
+  searchContainer?: ViewStyle;
+  cancelSearchText?: TextStyle;
+  searchEmptyText?: TextStyle;
+  listRow: EmojiPickerListRowStyles;
+  searchBar: EmojiPickerSearchBarStyles;
+  searchResultsRow: EmojiPickerSearchResultsRowStyles;
+  tabBar: EmojiPickerTabBarStyles;
 };
 
-export type EmojisByCategory = {
-  title: CategoryTypes;
-  data: JsonEmoji[];
+export type EmojiPickerListRowStyles = {
+  emojiRowContainer?: ViewStyle;
+  emojiContainer?: ViewStyle;
+  emojiText?: TextStyle;
+};
+
+export type EmojiPickerSearchBarStyles = {
+  searchIcon?: ImageStyle;
+  clearIcon?: ImageStyle;
+  searchInputContainer?: ViewStyle;
+  searchInputText?: TextStyle;
+};
+
+export type EmojiPickerSearchResultsRowStyles = {
+  rowContainer?: ViewStyle;
+  emojiText?: TextStyle;
+  nameText?: TextStyle;
+};
+
+export type EmojiPickerTabBarStyles = {
+  container?: ViewStyle;
+  tabBar?: ViewStyle;
+  categoryContainer?: ViewStyle;
+  iconContainer?: ViewStyle;
+  icon?: ImageStyle;
+  divider?: ViewStyle;
+  selectedItemBackgroundContainer?: ViewStyle;
+  selectedItemBackground?: ViewStyle;
 };
 
 export type JsonEmoji = {
-  emoji: string;
+  emoji?: string;
   name: string;
-  v: string;
-  toneEnabled: boolean;
-  keywords?: string[];
+  slug: string;
+  group: string;
+  emoji_version: string;
+  unicode_version: string;
+  skin_tone_support: boolean;
 };
+
+export type TranslationListType = { [key: string]: string };
+
+export type TranslationsType = { [code: string]: TranslationListType };

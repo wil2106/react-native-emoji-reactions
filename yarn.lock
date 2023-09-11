@@ -8456,11 +8456,6 @@ rimraf@~2.6.2:
   dependencies:
     glob "^7.1.3"
 
-rn-emoji-keyboard@^1.5.0:
-  version "1.5.0"
-  resolved "https://registry.yarnpkg.com/rn-emoji-keyboard/-/rn-emoji-keyboard-1.5.0.tgz#86307fa0fecab24dbf918811665cc460bcf7e70c"
-  integrity sha512-PnImBZxqpxzsNKHO8crGnpHdwdNh+b3CdT51Irsg3BnFd1ArQQzngqO8wP148JdD3GWZj+uvdn9aWn2KbALoAw==
-
 run-applescript@^5.0.0:
   version "5.0.0"
   resolved "https://registry.yarnpkg.com/run-applescript/-/run-applescript-5.0.0.tgz#e11e1c932e055d5c6b40d98374e0268d9b11899c"

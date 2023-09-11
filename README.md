@@ -1,6 +1,6 @@
 <p align="center" >
     React native emoji reactions component inspired by Slack<br />
-    No native elements<br />
+    Fully customizable<br />
   <a href="https://github.com/wil2106/rn-emoji-reactions">rn-emoji-reactions</a>
 </p>
 
