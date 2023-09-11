@@ -2,7 +2,7 @@ import * as React from 'react';
 import { View } from 'react-native';
 import { StyleSheet } from 'react-native';
 import PngIcon from './PngIcon';
-import { CATEGORIES_ICONS_SOURCES } from '../../src/constants';
+import { CATEGORIES_ICONS_SOURCES } from '../constants';
 import { TouchableOpacity } from 'react-native';
 import Animated, {
   useAnimatedStyle,

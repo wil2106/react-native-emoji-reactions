@@ -11,8 +11,8 @@ import React, {
   useState,
 } from 'react';
 import { Dimensions, Modal, StyleSheet } from 'react-native';
-import emojisByCategory from 'unicode-emoji-json/data-by-group.json';
-import emojis from 'unicode-emoji-json/data-by-emoji.json';
+import emojisByCategory from './constants/emojisByCategory';
+import emojis from './constants/emojis';
 import CustomBackdrop from './components/CustomBackdrop';
 import EmojiPickerListRow, {
   DEFAULT_EMOJI_CELL_HEIGHT,
