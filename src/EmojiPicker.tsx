@@ -11,8 +11,8 @@ import React, {
   useState,
 } from 'react';
 import { Dimensions, Modal, StyleSheet } from 'react-native';
-import emojisByCategory from './constants/emojisByCategory';
-import emojis from './constants/emojis';
+import emojisByCategory from 'unicode-emoji-json/data-by-group.json';
+import emojis from 'unicode-emoji-json/data-by-emoji.json';
 import CustomBackdrop from './components/CustomBackdrop';
 import EmojiPickerListRow, {
   DEFAULT_EMOJI_CELL_HEIGHT,
@@ -43,6 +43,7 @@ import {
 } from './utils';
 
 const DEVICE_WIDTH = Dimensions.get('window').width;
+const TOP_INSET = 50;
 
 export default function EmojiPicker({
   open,
@@ -298,6 +299,7 @@ export default function EmojiPicker({
             enablePanDownToClose={true}
             onDismiss={onClose}
             footerComponent={searchMode ? undefined : EmojiPickerTabBarFooter}
+            topInset={TOP_INSET}
             handleIndicatorStyle={[
               styles?.knob,
               theme?.knob
