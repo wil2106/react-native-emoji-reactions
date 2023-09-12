@@ -2,6 +2,7 @@ import {
   BottomSheetModal,
   BottomSheetModalProvider,
   BottomSheetVirtualizedList,
+  BottomSheetVirtualizedListMethods,
 } from '@gorhom/bottom-sheet';
 import React, {
   useCallback,
@@ -15,8 +16,7 @@ import emojisByCategory from 'unicode-emoji-json/data-by-group.json';
 import emojis from 'unicode-emoji-json/data-by-emoji.json';
 import CustomBackdrop from './components/CustomBackdrop';
 import EmojiPickerListRow, {
-  DEFAULT_EMOJI_CELL_HEIGHT,
-  DEFAULT_EMOJI_CELL_WIDTH,
+  EMOJI_CELL_SIZE,
 } from './components/EmojiPickerListRow';
 import {
   ICON_CONTAINER_PADDING,
@@ -26,7 +26,7 @@ import {
 import EmojiPickerTabBarFooter from './components/EmojiPickerTabBarFooter';
 import { CATEGORIES_KEYS, MAX_RECENT_EMOJIS } from './constants';
 import { EmojiPickerTabBarContext } from './context';
-import type { EmojiPickerProps, JsonEmoji } from './types';
+import type { Category, EmojiPickerProps, EmojiRow, JsonEmoji } from './types';
 import { Text } from 'react-native';
 import { View } from 'react-native';
 import { EmojiPickerSearchBar } from './components/EmojiPickerSearchBar';
@@ -41,6 +41,8 @@ import {
   getRecentEmojisFromLocalStorage,
   setRecentEmojisInLocalStorage,
 } from './utils';
+import type { NativeScrollEvent } from 'react-native';
+import type { NativeSyntheticEvent } from 'react-native';
 
 const DEVICE_WIDTH = Dimensions.get('window').width;
 const TOP_INSET = 50;
@@ -57,7 +59,9 @@ export default function EmojiPicker({
   styles,
 }: EmojiPickerProps) {
   const snapPoints = useMemo(() => ['45%', '95%'], []);
+  let lastScrollCheckAt = useRef<number>().current;
   const bottomSheetRef = useRef<BottomSheetModal>(null);
+  const emojiListRef = useRef<BottomSheetVirtualizedListMethods>(null);
   const [currentCategoryIndex, setCurrentCategoryIndex] = useState(0);
   const [search, setSearch] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
@@ -87,23 +91,36 @@ export default function EmojiPicker({
   }, [open]);
 
   const nbEmojisPerRow = useMemo(
-    () => Math.floor(DEVICE_WIDTH / DEFAULT_EMOJI_CELL_WIDTH),
+    () => Math.floor(DEVICE_WIDTH / EMOJI_CELL_SIZE),
     []
   );
 
-  const emojiRowsByCategory = useMemo(() => {
-    let theEmojiRowsByCategory = [];
-    for (const [category, categoryEmojis] of Object.entries(emojisByCategory)) {
-      if (category === 'default') continue;
-      let theEmojiRows = [];
-      let emojiRow = [];
+  const emojiRows = useMemo(() => {
+    let theEmojiRows: EmojiRow[] = [];
+
+    for (const [categoryName, categoryEmojis] of Object.entries(
+      emojisByCategory
+    )) {
+      if (categoryName === 'default') continue;
+
+      const key = CATEGORIES_KEYS[categoryName] ?? 'unknown';
+      theEmojiRows.push({
+        title: {
+          key,
+          name: t(key, language, newTranslations, categoryName),
+        },
+      });
+
+      let emojiRow: (JsonEmoji | null)[] = [];
       for (let i = 0; i < categoryEmojis.length; i++) {
         if (i !== 0 && i % nbEmojisPerRow === 0) {
-          theEmojiRows.push(emojiRow);
+          theEmojiRows.push({ emojis: emojiRow });
           emojiRow = [];
         }
         const emoji = categoryEmojis[i];
-        emojiRow.push(emoji);
+        if (emoji) {
+          emojiRow.push(emoji);
+        }
       }
       //add remaining emojis
       if (emojiRow.length > 0) {
@@ -112,28 +129,31 @@ export default function EmojiPicker({
         for (let a = lastRowEmojisCount; a < nbEmojisPerRow; a++) {
           emojiRow.push(null);
         }
-        theEmojiRows.push(emojiRow);
+        theEmojiRows.push({ emojis: emojiRow });
       }
-      const key = CATEGORIES_KEYS[category] ?? 'unknown';
-      theEmojiRowsByCategory.push({
-        key: key,
-        name: t(key, language, newTranslations, category),
-        emojiRows: theEmojiRows,
-      });
     }
-    return theEmojiRowsByCategory;
+    return theEmojiRows;
   }, [nbEmojisPerRow, language, newTranslations]);
 
-  const recentEmojiRowsCategory = useMemo(() => {
-    let theRecentEmojiRows = [];
-    let emojiRow = [];
+  const recentEmojiRows = useMemo(() => {
+    let theRecentEmojiRows: EmojiRow[] = [
+      {
+        title: {
+          key: 'recently_used',
+          name: t('recently_used', language, newTranslations, 'Recently used'),
+        },
+      },
+    ];
+    let emojiRow: (JsonEmoji | null)[] = [];
     for (let i = 0; i < recentEmojis.length; i++) {
       if (i !== 0 && i % nbEmojisPerRow === 0) {
-        theRecentEmojiRows.push(emojiRow);
+        theRecentEmojiRows.push({ emojis: emojiRow });
         emojiRow = [];
       }
       const emoji = recentEmojis[i];
-      emojiRow.push(emoji);
+      if (emoji) {
+        emojiRow.push(emoji);
+      }
     }
     //add remaining emojis
     if (emojiRow.length > 0) {
@@ -142,23 +162,32 @@ export default function EmojiPicker({
       for (let a = lastRowEmojisCount; a < nbEmojisPerRow; a++) {
         emojiRow.push(null);
       }
-      theRecentEmojiRows.push(emojiRow);
+      theRecentEmojiRows.push({ emojis: emojiRow });
     }
-    return {
-      key: 'recently_used',
-      name: t('recently_used', language, newTranslations, 'Recently used'),
-      emojiRows: theRecentEmojiRows,
-    };
+    return theRecentEmojiRows;
   }, [nbEmojisPerRow, recentEmojis, language, newTranslations]);
 
-  const finalEmojiRowsByCategory = useMemo(() => {
+  const finalEmojiRows = useMemo(() => {
     return [
-      ...(recentEmojiRowsCategory.emojiRows.length > 0
-        ? [recentEmojiRowsCategory]
-        : []),
-      ...emojiRowsByCategory,
+      ...(recentEmojiRows.length > 0 ? recentEmojiRows : []),
+      ...emojiRows,
     ];
-  }, [emojiRowsByCategory, recentEmojiRowsCategory]);
+  }, [emojiRows, recentEmojiRows]);
+
+  const categories = useMemo(() => {
+    const theCategories: Category[] = [];
+    for (let i = 0; i < finalEmojiRows.length; i++) {
+      const emojiRow = finalEmojiRows[i];
+      if (emojiRow?.title) {
+        theCategories.push({
+          key: emojiRow?.title.key,
+          name: emojiRow?.title.name,
+          yOffset: i * EMOJI_CELL_SIZE,
+        });
+      }
+    }
+    return theCategories;
+  }, [finalEmojiRows]);
 
   const searchedEmojis = useMemo(() => {
     if (debouncedSearch.trim().length === 0) {
@@ -182,21 +211,6 @@ export default function EmojiPicker({
     }
     return theSearchedEmojis;
   }, [debouncedSearch, language, newTranslations]);
-
-  const currentCategory = useMemo(
-    () =>
-      finalEmojiRowsByCategory[currentCategoryIndex] ?? {
-        key: 'unknown',
-        name: 'unknown',
-        emojiRows: [],
-      },
-    [finalEmojiRowsByCategory, currentCategoryIndex]
-  );
-
-  const categories = useMemo(
-    () => finalEmojiRowsByCategory.map((cat) => cat.key),
-    [finalEmojiRowsByCategory]
-  );
 
   const translatedRecentEmojis = useMemo(
     () =>
@@ -225,16 +239,17 @@ export default function EmojiPicker({
     [onSelectEmoji, recentEmojis]
   );
 
-  const renderEmojiPickerListRow = useCallback(
-    ({ item }) => (
+  const renderEmojiPickerRow = useCallback(
+    ({ item }: { item: EmojiRow }) => (
       <EmojiPickerListRow
         item={item}
         onChooseEmoji={onChooseEmoji}
+        nbEmojisPerRow={nbEmojisPerRow}
         theme={theme?.listRow}
         styles={styles?.listRow}
       />
     ),
-    [onChooseEmoji, theme, styles]
+    [onChooseEmoji, theme, styles, nbEmojisPerRow]
   );
 
   const renderEmojiPickerSearchResultsRow = useCallback(
@@ -279,12 +294,48 @@ export default function EmojiPicker({
     bottomSheetRef.current?.snapToIndex(1);
   };
 
+  const onSelectCategory = (index: number) => {
+    setCurrentCategoryIndex(index);
+    bottomSheetRef.current?.expand();
+    if (emojiListRef.current && categories[index] !== undefined) {
+      setTimeout(() => {
+        // disable scroll check for 1s
+        lastScrollCheckAt = Date.now() + 1000;
+        emojiListRef.current!.scrollToOffset({
+          animated: false,
+          offset: categories[index]!.yOffset,
+        });
+      }, 1000);
+    }
+  };
+
+  const onEmojiListScroll = (
+    event: NativeSyntheticEvent<NativeScrollEvent>
+  ) => {
+    //throttle
+    const now = Date.now();
+    if (lastScrollCheckAt !== undefined && now - lastScrollCheckAt < 500) {
+      return;
+    }
+    lastScrollCheckAt = now;
+    const yOffset = event.nativeEvent.contentOffset.y;
+    for (let i = 0; i < categories.length; i++) {
+      if (
+        categories[i]!.yOffset <= yOffset &&
+        (categories[i + 1]?.yOffset ?? Infinity) > yOffset
+      ) {
+        setCurrentCategoryIndex(i);
+        break;
+      }
+    }
+  };
+
   return (
     <EmojiPickerTabBarContext.Provider
       value={{
         categories,
         currentCategoryIndex,
-        setCurrentCategoryIndex,
+        onSelectCategory,
         theme: theme?.tabBar,
         styles: styles?.tabBar,
       }}
@@ -396,47 +447,30 @@ export default function EmojiPicker({
                 })}
               />
             ) : (
-              <>
-                <View style={defaultStyles.titleContainer}>
-                  <Text
-                    style={[
-                      defaultStyles.titleText,
-                      styles?.titleText,
-                      theme?.titleText
-                        ? {
-                            color: theme.titleText,
-                          }
-                        : {},
-                    ]}
-                  >
-                    {currentCategory.name}
-                  </Text>
-                </View>
-                <BottomSheetVirtualizedList
-                  data={currentCategory.emojiRows}
-                  keyExtractor={(_, rowIndex) =>
-                    `${currentCategory.key}-row-${rowIndex}`
-                  }
-                  getItemCount={(data) => data.length}
-                  getItem={(data, rowIndex) => data[rowIndex]}
-                  renderItem={renderEmojiPickerListRow}
-                  style={{ width: DEVICE_WIDTH }}
-                  contentContainerStyle={[
-                    defaultStyles.listContainer,
-                    styles?.listContainer,
-                    theme?.listContainerBackground
-                      ? {
-                          backgroundColor: theme.listContainerBackground,
-                        }
-                      : {},
-                  ]}
-                  getItemLayout={(_, rowIndex) => ({
-                    length: DEFAULT_EMOJI_CELL_HEIGHT,
-                    offset: DEFAULT_EMOJI_CELL_HEIGHT * rowIndex,
-                    index: rowIndex,
-                  })}
-                />
-              </>
+              <BottomSheetVirtualizedList
+                ref={emojiListRef}
+                data={finalEmojiRows}
+                onScroll={onEmojiListScroll}
+                keyExtractor={(_, rowIndex) => rowIndex + ''}
+                getItemCount={(data) => data.length}
+                getItem={(data, rowIndex) => data[rowIndex]}
+                renderItem={renderEmojiPickerRow}
+                style={{ width: DEVICE_WIDTH }}
+                contentContainerStyle={[
+                  defaultStyles.listContainer,
+                  styles?.listContainer,
+                  theme?.listContainerBackground
+                    ? {
+                        backgroundColor: theme.listContainerBackground,
+                      }
+                    : {},
+                ]}
+                getItemLayout={(_, rowIndex) => ({
+                  length: EMOJI_CELL_SIZE,
+                  offset: EMOJI_CELL_SIZE * rowIndex,
+                  index: rowIndex,
+                })}
+              />
             )}
           </BottomSheetModal>
         </BottomSheetModalProvider>
@@ -457,10 +491,6 @@ const defaultStyles = StyleSheet.create({
     paddingBottom: TABBAR_BOTTOM_SPACE + ICON_SIZE + ICON_CONTAINER_PADDING * 2,
   },
   searchListContainer: {},
-  titleContainer: {
-    paddingVertical: 4,
-    paddingHorizontal: 15,
-  },
   titleText: {
     fontSize: 16,
     color: '#5F5F5F',

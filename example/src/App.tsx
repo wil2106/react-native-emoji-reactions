@@ -138,13 +138,14 @@ const CUSTOM_THEME = {
     divider: '#2E3538',
     listContainerBackground: '#1C1D21',
     searchListContainerBackground: '#1C1D21',
-    titleText: '#9B9C9E',
     searchContainerBackground: '#1C1D21',
     cancelSearchText: '#D2D2D2',
     searchEmptyText: '#767779',
     listRow: {
       emojiRowContainerBackground: '#1C1D21',
       emojiContainerBackground: '#1C1D21',
+      titleTextBackground: 'transparent',
+      titleText: '#9B9C9E',
     },
     searchBar: {
       searchIcon: '#A1A1AB',

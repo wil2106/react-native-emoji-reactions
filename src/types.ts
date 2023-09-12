@@ -136,7 +136,6 @@ export type EmojiPickerTheme = {
   divider?: string;
   listContainerBackground?: string;
   searchListContainerBackground?: string;
-  titleText?: string;
   searchContainerBackground?: string;
   cancelSearchText?: string;
   searchEmptyText?: string;
@@ -149,6 +148,8 @@ export type EmojiPickerTheme = {
 export type EmojiPickerListRowTheme = {
   emojiRowContainerBackground?: string;
   emojiContainerBackground?: string;
+  titleContainerBackground?: string;
+  titleText?: string;
 };
 
 export type EmojiPickerSearchBarTheme = {
@@ -221,7 +222,6 @@ export type EmojiPickerStyles = {
   knob?: ViewStyle;
   listContainer?: ViewStyle;
   searchListContainer?: ViewStyle;
-  titleText?: TextStyle;
   searchContainer?: ViewStyle;
   cancelSearchText?: TextStyle;
   searchEmptyText?: TextStyle;
@@ -235,6 +235,8 @@ export type EmojiPickerListRowStyles = {
   emojiRowContainer?: ViewStyle;
   emojiContainer?: ViewStyle;
   emojiText?: TextStyle;
+  titleContainer?: ViewStyle;
+  titleText?: TextStyle;
 };
 
 export type EmojiPickerSearchBarStyles = {
@@ -262,11 +264,26 @@ export type EmojiPickerTabBarStyles = {
 };
 
 export type JsonEmoji = {
-  emoji?: string;
+  emoji: string;
   name: string;
   slug: string;
-  group: string;
   emoji_version: string;
   unicode_version: string;
   skin_tone_support: boolean;
+  group?: string;
+  skin_tone_support_unicode_version?: string;
+};
+
+export type EmojiRow = {
+  title?: {
+    key: string;
+    name: string;
+  };
+  emojis?: (JsonEmoji | null)[];
+};
+
+export type Category = {
+  key: string;
+  name: string;
+  yOffset: number;
 };
