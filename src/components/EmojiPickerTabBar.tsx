@@ -9,6 +9,7 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 import type {
+  Category,
   EmojiPickerTabBarStyles,
   EmojiPickerTabBarTheme,
 } from '../../src/types';
@@ -22,13 +23,13 @@ export const DIVIDER_WIDTH = 1;
 export default function EmojiPickerTabBar({
   categories,
   selectedIndex,
-  setSelectedIndex,
+  onSelectCategory,
   theme,
   styles,
 }: {
-  categories: string[];
+  categories: Category[];
   selectedIndex: number;
-  setSelectedIndex: (index: number) => void;
+  onSelectCategory: (index: number) => void;
   theme?: EmojiPickerTabBarTheme;
   styles?: EmojiPickerTabBarStyles;
 }) {
@@ -87,7 +88,7 @@ export default function EmojiPickerTabBar({
           >
             <TouchableOpacity
               style={[defaultStyles.iconContainer, styles?.iconContainer]}
-              onPress={() => setSelectedIndex(index)}
+              onPress={() => onSelectCategory(index)}
             >
               <PngIcon
                 fill={
@@ -96,7 +97,7 @@ export default function EmojiPickerTabBar({
                     : theme?.inactiveIcon ?? '#1C1C1C'
                 }
                 source={
-                  CATEGORIES_ICONS_SOURCES[category] ??
+                  CATEGORIES_ICONS_SOURCES[category.key] ??
                   CATEGORIES_ICONS_SOURCES.unknown!
                 }
                 styles={styles?.icon}

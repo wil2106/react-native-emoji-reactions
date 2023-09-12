@@ -9,19 +9,14 @@ import EmojiPickerTabBar from './EmojiPickerTabBar';
 const EmojiPickerTabBarFooter = ({
   animatedFooterPosition,
 }: BottomSheetFooterProps) => {
-  const {
-    categories,
-    currentCategoryIndex,
-    setCurrentCategoryIndex,
-    theme,
-    styles,
-  } = useContext(EmojiPickerTabBarContext);
+  const { categories, currentCategoryIndex, onSelectCategory, theme, styles } =
+    useContext(EmojiPickerTabBarContext);
   return (
     <BottomSheetFooter animatedFooterPosition={animatedFooterPosition}>
       <EmojiPickerTabBar
         categories={categories}
         selectedIndex={currentCategoryIndex}
-        setSelectedIndex={setCurrentCategoryIndex}
+        onSelectCategory={onSelectCategory}
         theme={theme}
         styles={styles}
       />
