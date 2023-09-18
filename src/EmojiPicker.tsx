@@ -11,7 +11,7 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import { Dimensions, Modal, StyleSheet } from 'react-native';
+import { Dimensions, StyleSheet } from 'react-native';
 import emojisByCategory from 'unicode-emoji-json/data-by-group.json';
 import emojis from 'unicode-emoji-json/data-by-emoji.json';
 import CustomBackdrop from './components/CustomBackdrop';
@@ -340,141 +340,135 @@ export default function EmojiPicker({
         styles: styles?.tabBar,
       }}
     >
-      <Modal transparent={true} visible={open}>
-        <BottomSheetModalProvider>
-          <BottomSheetModal
-            ref={bottomSheetRef}
-            index={0}
-            snapPoints={snapPoints}
-            backdropComponent={CustomBackdrop}
-            enablePanDownToClose={true}
-            onDismiss={onClose}
-            footerComponent={searchMode ? undefined : EmojiPickerTabBarFooter}
-            topInset={TOP_INSET}
-            handleIndicatorStyle={[
-              styles?.knob,
-              theme?.knob
-                ? {
-                    backgroundColor: theme.knob,
-                  }
-                : {},
-            ]}
-            backgroundStyle={[
-              defaultStyles.background,
-              theme?.background
-                ? {
-                    backgroundColor: theme.background,
-                  }
-                : {},
-            ]}
-          >
-            {!disableSearch && (
-              <View
-                style={[
-                  defaultStyles.searchContainer,
-                  styles?.searchContainer,
-                  theme?.searchContainerBackground
-                    ? {
-                        backgroundColor: theme.searchContainerBackground,
-                      }
-                    : {},
-                  theme?.divider
-                    ? {
-                        borderColor: theme.divider,
-                      }
-                    : {},
-                ]}
-              >
-                <EmojiPickerSearchBar
-                  value={search}
-                  onChangeText={setSearch}
-                  onDebounceChangeText={setDebouncedSearch}
-                  placeholder={t(
-                    'search_placeholder',
-                    language,
-                    newTranslations
-                  )}
-                  onFocus={() => setSearchMode(true)}
-                  theme={theme?.searchBar}
-                  styles={styles?.searchBar}
-                />
-                {searchMode && (
-                  <TouchableOpacity onPress={onCancelSearch}>
-                    <Text
-                      style={[
-                        defaultStyles.cancelSearchText,
-                        styles?.cancelSearchText,
-                        theme?.cancelSearchText
-                          ? {
-                              color: theme.cancelSearchText,
-                            }
-                          : {},
-                      ]}
-                      numberOfLines={1}
-                    >
-                      {t('cancel', language, newTranslations, 'Cancel')}
-                    </Text>
-                  </TouchableOpacity>
-                )}
-              </View>
-            )}
-            {searchMode ? (
-              <BottomSheetVirtualizedList
-                data={
-                  search.trim().length > 0
-                    ? searchedEmojis
-                    : translatedRecentEmojis
+      <BottomSheetModalProvider>
+        <BottomSheetModal
+          ref={bottomSheetRef}
+          index={0}
+          snapPoints={snapPoints}
+          backdropComponent={CustomBackdrop}
+          enablePanDownToClose={true}
+          onDismiss={onClose}
+          footerComponent={searchMode ? undefined : EmojiPickerTabBarFooter}
+          topInset={TOP_INSET}
+          handleIndicatorStyle={[
+            styles?.knob,
+            theme?.knob
+              ? {
+                  backgroundColor: theme.knob,
                 }
-                ListHeaderComponent={renderEmptySearchComponent}
-                keyExtractor={(emoji: JsonEmoji) => emoji.slug}
-                getItemCount={(data) => data.length}
-                getItem={(data, rowIndex) => data[rowIndex]}
-                renderItem={renderEmojiPickerSearchResultsRow}
-                style={{ width: DEVICE_WIDTH }}
-                contentContainerStyle={[
-                  defaultStyles.searchListContainer,
-                  styles?.searchListContainer,
-                  theme?.searchListContainerBackground
-                    ? {
-                        backgroundColor: theme.searchListContainerBackground,
-                      }
-                    : {},
-                ]}
-                getItemLayout={(_, rowIndex) => ({
-                  length: EMOJI_PICKER_SEARCH_RESULT_ROW_HEIGHT,
-                  offset: EMOJI_PICKER_SEARCH_RESULT_ROW_HEIGHT * rowIndex,
-                  index: rowIndex,
-                })}
+              : {},
+          ]}
+          backgroundStyle={[
+            defaultStyles.background,
+            theme?.background
+              ? {
+                  backgroundColor: theme.background,
+                }
+              : {},
+          ]}
+        >
+          {!disableSearch && (
+            <View
+              style={[
+                defaultStyles.searchContainer,
+                styles?.searchContainer,
+                theme?.searchContainerBackground
+                  ? {
+                      backgroundColor: theme.searchContainerBackground,
+                    }
+                  : {},
+                theme?.divider
+                  ? {
+                      borderColor: theme.divider,
+                    }
+                  : {},
+              ]}
+            >
+              <EmojiPickerSearchBar
+                value={search}
+                onChangeText={setSearch}
+                onDebounceChangeText={setDebouncedSearch}
+                placeholder={t('search_placeholder', language, newTranslations)}
+                onFocus={() => setSearchMode(true)}
+                theme={theme?.searchBar}
+                styles={styles?.searchBar}
               />
-            ) : (
-              <BottomSheetVirtualizedList
-                ref={emojiListRef}
-                data={finalEmojiRows}
-                onScroll={onEmojiListScroll}
-                keyExtractor={(_, rowIndex) => rowIndex + ''}
-                getItemCount={(data) => data.length}
-                getItem={(data, rowIndex) => data[rowIndex]}
-                renderItem={renderEmojiPickerRow}
-                style={{ width: DEVICE_WIDTH }}
-                contentContainerStyle={[
-                  defaultStyles.listContainer,
-                  styles?.listContainer,
-                  theme?.listContainerBackground
-                    ? {
-                        backgroundColor: theme.listContainerBackground,
-                      }
-                    : {},
-                ]}
-                getItemLayout={(_, rowIndex) => ({
-                  length: EMOJI_CELL_SIZE,
-                  offset: EMOJI_CELL_SIZE * rowIndex,
-                  index: rowIndex,
-                })}
-              />
-            )}
-          </BottomSheetModal>
-        </BottomSheetModalProvider>
-      </Modal>
+              {searchMode && (
+                <TouchableOpacity onPress={onCancelSearch}>
+                  <Text
+                    style={[
+                      defaultStyles.cancelSearchText,
+                      styles?.cancelSearchText,
+                      theme?.cancelSearchText
+                        ? {
+                            color: theme.cancelSearchText,
+                          }
+                        : {},
+                    ]}
+                    numberOfLines={1}
+                  >
+                    {t('cancel', language, newTranslations, 'Cancel')}
+                  </Text>
+                </TouchableOpacity>
+              )}
+            </View>
+          )}
+          {searchMode ? (
+            <BottomSheetVirtualizedList
+              data={
+                search.trim().length > 0
+                  ? searchedEmojis
+                  : translatedRecentEmojis
+              }
+              ListHeaderComponent={renderEmptySearchComponent}
+              keyExtractor={(emoji: JsonEmoji) => emoji.slug}
+              getItemCount={(data) => data.length}
+              getItem={(data, rowIndex) => data[rowIndex]}
+              renderItem={renderEmojiPickerSearchResultsRow}
+              style={{ width: DEVICE_WIDTH }}
+              contentContainerStyle={[
+                defaultStyles.searchListContainer,
+                styles?.searchListContainer,
+                theme?.searchListContainerBackground
+                  ? {
+                      backgroundColor: theme.searchListContainerBackground,
+                    }
+                  : {},
+              ]}
+              getItemLayout={(_, rowIndex) => ({
+                length: EMOJI_PICKER_SEARCH_RESULT_ROW_HEIGHT,
+                offset: EMOJI_PICKER_SEARCH_RESULT_ROW_HEIGHT * rowIndex,
+                index: rowIndex,
+              })}
+            />
+          ) : (
+            <BottomSheetVirtualizedList
+              ref={emojiListRef}
+              data={finalEmojiRows}
+              onScroll={onEmojiListScroll}
+              keyExtractor={(_, rowIndex) => rowIndex + ''}
+              getItemCount={(data) => data.length}
+              getItem={(data, rowIndex) => data[rowIndex]}
+              renderItem={renderEmojiPickerRow}
+              style={{ width: DEVICE_WIDTH }}
+              contentContainerStyle={[
+                defaultStyles.listContainer,
+                styles?.listContainer,
+                theme?.listContainerBackground
+                  ? {
+                      backgroundColor: theme.listContainerBackground,
+                    }
+                  : {},
+              ]}
+              getItemLayout={(_, rowIndex) => ({
+                length: EMOJI_CELL_SIZE,
+                offset: EMOJI_CELL_SIZE * rowIndex,
+                index: rowIndex,
+              })}
+            />
+          )}
+        </BottomSheetModal>
+      </BottomSheetModalProvider>
     </EmojiPickerTabBarContext.Provider>
   );
 }
