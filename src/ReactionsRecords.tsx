@@ -1,26 +1,32 @@
 import {
+  BottomSheetFlatList,
   BottomSheetModal,
   BottomSheetModalProvider,
 } from '@gorhom/bottom-sheet';
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useContext, useEffect, useMemo, useRef, useState } from 'react';
 import type { NativeScrollEvent, NativeSyntheticEvent } from 'react-native';
-import { Dimensions, FlatList, ScrollView, StyleSheet } from 'react-native';
+import { Dimensions, ScrollView, StyleSheet } from 'react-native';
 import CustomBackdrop from './components/CustomBackdrop';
 import ReactionsRecordsTabBar from './components/ReactionsRecordsTabBar';
 import UserItem from './components/UserItem';
 import type { ReactionsRecordsProps } from './types';
+import { Modal } from 'react-native';
+import { gestureHandlerRootHOC } from 'react-native-gesture-handler';
+import { ReactionRecordsContext } from './context';
 
 const DEVICE_WIDTH = Dimensions.get('window').width;
 
-export default function ReactionsRecords({
-  open,
-  reactionsGroups,
-  onClose,
-  onOpenUserProfile,
-  theme,
-  styles,
-  enableGroupChangeAnimation,
-}: ReactionsRecordsProps) {
+const ReactionsRecordsWithHOC = gestureHandlerRootHOC(() => {
+  const {
+    open,
+    reactionsGroups,
+    onClose,
+    onOpenUserProfile,
+    theme,
+    styles,
+    enableGroupChangeAnimation,
+  } = useContext(ReactionRecordsContext);
+
   const snapPoints = useMemo(() => ['45%', '95%'], []);
   const bottomSheetRef = useRef<BottomSheetModal>(null);
   const scrollViewRef = useRef<ScrollView>(null);
@@ -49,7 +55,7 @@ export default function ReactionsRecords({
   ) => {
     // on scroll view animation end, calculate and set displayed group index from x offset
     setSelectedGroupIndex(
-      Math.floor(event.nativeEvent.contentOffset.x / DEVICE_WIDTH)
+      Math.ceil(event.nativeEvent.contentOffset.x / DEVICE_WIDTH)
     );
   };
 
@@ -64,6 +70,9 @@ export default function ReactionsRecords({
   return (
     <BottomSheetModalProvider>
       <BottomSheetModal
+        activeOffsetX={[-999, 999]}
+        activeOffsetY={[-5, 5]}
+        enableContentPanningGesture
         ref={bottomSheetRef}
         index={0}
         snapPoints={snapPoints}
@@ -105,7 +114,7 @@ export default function ReactionsRecords({
           onMomentumScrollEnd={onMomentumScrollEnd}
         >
           {reactionsGroups.map((reactionsGroup, reactionsGroupIndex) => (
-            <FlatList
+            <BottomSheetFlatList
               key={`${reactionsGroup.emoji}-${reactionsGroupIndex}`}
               style={{ width: DEVICE_WIDTH }}
               data={reactionsGroup.reactions}
@@ -129,6 +138,34 @@ export default function ReactionsRecords({
         </ScrollView>
       </BottomSheetModal>
     </BottomSheetModalProvider>
+  );
+});
+
+export default function ReactionsRecords({
+  open,
+  reactionsGroups,
+  onClose,
+  onOpenUserProfile,
+  theme,
+  styles,
+  enableGroupChangeAnimation,
+}: ReactionsRecordsProps) {
+  return (
+    <Modal visible={open} transparent>
+      <ReactionRecordsContext.Provider
+        value={{
+          open,
+          reactionsGroups,
+          onClose,
+          onOpenUserProfile,
+          theme,
+          styles,
+          enableGroupChangeAnimation,
+        }}
+      >
+        <ReactionsRecordsWithHOC />
+      </ReactionRecordsContext.Provider>
+    </Modal>
   );
 }
 

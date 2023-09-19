@@ -6,18 +6,34 @@ import {
 } from '@gorhom/bottom-sheet';
 import React, {
   useCallback,
+  useContext,
   useEffect,
   useMemo,
   useRef,
   useState,
 } from 'react';
-import { Dimensions, StyleSheet } from 'react-native';
-import emojisByCategory from 'unicode-emoji-json/data-by-group.json';
+import type { NativeScrollEvent, NativeSyntheticEvent } from 'react-native';
+import {
+  Dimensions,
+  Keyboard,
+  Modal,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
+import { gestureHandlerRootHOC } from 'react-native-gesture-handler';
 import emojis from 'unicode-emoji-json/data-by-emoji.json';
+import emojisByCategory from 'unicode-emoji-json/data-by-group.json';
 import CustomBackdrop from './components/CustomBackdrop';
 import EmojiPickerListRow, {
   EMOJI_CELL_SIZE,
 } from './components/EmojiPickerListRow';
+import { EmojiPickerSearchBar } from './components/EmojiPickerSearchBar';
+import {
+  EMOJI_PICKER_SEARCH_RESULT_ROW_HEIGHT,
+  EmojiPickerSearchResultsRow,
+} from './components/EmojiPickerSearchResultsRow';
 import {
   ICON_CONTAINER_PADDING,
   ICON_SIZE,
@@ -25,39 +41,29 @@ import {
 } from './components/EmojiPickerTabBar';
 import EmojiPickerTabBarFooter from './components/EmojiPickerTabBarFooter';
 import { CATEGORIES_KEYS, MAX_RECENT_EMOJIS } from './constants';
-import { EmojiPickerTabBarContext } from './context';
-import type { Category, EmojiPickerProps, EmojiRow, JsonEmoji } from './types';
-import { Text } from 'react-native';
-import { View } from 'react-native';
-import { EmojiPickerSearchBar } from './components/EmojiPickerSearchBar';
-import { TouchableOpacity } from 'react-native';
-import { Keyboard } from 'react-native';
-import {
-  EMOJI_PICKER_SEARCH_RESULT_ROW_HEIGHT,
-  EmojiPickerSearchResultsRow,
-} from './components/EmojiPickerSearchResultsRow';
+import { EmojiPickerContext, EmojiPickerTabBarContext } from './context';
 import { t } from './translation';
+import type { Category, EmojiPickerProps, EmojiRow, JsonEmoji } from './types';
 import {
   getRecentEmojisFromLocalStorage,
   setRecentEmojisInLocalStorage,
 } from './utils';
-import type { NativeScrollEvent } from 'react-native';
-import type { NativeSyntheticEvent } from 'react-native';
 
 const DEVICE_WIDTH = Dimensions.get('window').width;
 const TOP_INSET = 50;
 
-export default function EmojiPicker({
-  open,
-  onClose,
-  onSelectEmoji,
-  disableSearch,
-  disableRecentlyUsed,
-  language,
-  newTranslations,
-  theme,
-  styles,
-}: EmojiPickerProps) {
+const EmojiPickerwithHOC = gestureHandlerRootHOC(() => {
+  const {
+    open,
+    onClose,
+    onSelectEmoji,
+    disableSearch,
+    disableRecentlyUsed,
+    language,
+    newTranslations,
+    theme,
+    styles,
+  } = useContext(EmojiPickerContext);
   const snapPoints = useMemo(() => ['45%', '95%'], []);
   let lastScrollCheckAt = useRef<number>().current;
   const bottomSheetRef = useRef<BottomSheetModal>(null);
@@ -440,6 +446,8 @@ export default function EmojiPicker({
                 offset: EMOJI_PICKER_SEARCH_RESULT_ROW_HEIGHT * rowIndex,
                 index: rowIndex,
               })}
+              keyboardShouldPersistTaps="always"
+              keyboardDismissMode="none"
             />
           ) : (
             <BottomSheetVirtualizedList
@@ -470,6 +478,38 @@ export default function EmojiPicker({
         </BottomSheetModal>
       </BottomSheetModalProvider>
     </EmojiPickerTabBarContext.Provider>
+  );
+});
+
+export default function EmojiPicker({
+  open,
+  onClose,
+  onSelectEmoji,
+  disableSearch,
+  disableRecentlyUsed,
+  language,
+  newTranslations,
+  theme,
+  styles,
+}: EmojiPickerProps) {
+  return (
+    <Modal visible={open} transparent>
+      <EmojiPickerContext.Provider
+        value={{
+          open,
+          onClose,
+          onSelectEmoji,
+          disableSearch,
+          disableRecentlyUsed,
+          language,
+          newTranslations,
+          theme,
+          styles,
+        }}
+      >
+        <EmojiPickerwithHOC />
+      </EmojiPickerContext.Provider>
+    </Modal>
   );
 }
 

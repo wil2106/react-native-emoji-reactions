@@ -207,40 +207,42 @@ export default function App() {
   };
   return (
     <GestureHandlerRootView style={styles.container}>
-      <View style={styles.row}>
-        <Text>Enable custom theme:</Text>
-        <Switch
-          onValueChange={toggleEnableCustomTheme}
-          value={enableCustomTheme}
+      <View>
+        <View style={styles.row}>
+          <Text>Enable custom theme:</Text>
+          <Switch
+            onValueChange={toggleEnableCustomTheme}
+            value={enableCustomTheme}
+          />
+        </View>
+        <View style={styles.row}>
+          <Text>Enable custom style:</Text>
+          <Switch
+            onValueChange={toggleEnableCustomStyle}
+            value={enableCustomStyle}
+          />
+        </View>
+        <View style={styles.row}>
+          <Text>Enable custom translation:</Text>
+          <Switch
+            onValueChange={toggleEnableCustomTranslation}
+            value={enableCustomTranslation}
+          />
+        </View>
+        <Reactions
+          currentUserId={CURRENT_USER.id}
+          reactions={reactions}
+          onAddReaction={onAddReaction}
+          onRemoveReaction={onRemoveReaction}
+          onOpenUserProfile={(userId) =>
+            console.log(`Open user profile with id: ${userId}`)
+          }
+          language={enableCustomTranslation ? 'fr' : undefined}
+          newTranslations={{ fr }}
+          theme={enableCustomTheme ? CUSTOM_THEME : {}}
+          styles={enableCustomStyle ? CUSTOM_STYLE : {}}
         />
       </View>
-      <View style={styles.row}>
-        <Text>Enable custom style:</Text>
-        <Switch
-          onValueChange={toggleEnableCustomStyle}
-          value={enableCustomStyle}
-        />
-      </View>
-      <View style={styles.row}>
-        <Text>Enable custom translation:</Text>
-        <Switch
-          onValueChange={toggleEnableCustomTranslation}
-          value={enableCustomTranslation}
-        />
-      </View>
-      <Reactions
-        currentUserId={CURRENT_USER.id}
-        reactions={reactions}
-        onAddReaction={onAddReaction}
-        onRemoveReaction={onRemoveReaction}
-        onOpenUserProfile={(userId) =>
-          console.log(`Open user profile with id: ${userId}`)
-        }
-        language={enableCustomTranslation ? 'fr' : undefined}
-        newTranslations={{ fr }}
-        theme={enableCustomTheme ? CUSTOM_THEME : {}}
-        styles={enableCustomStyle ? CUSTOM_STYLE : {}}
-      />
     </GestureHandlerRootView>
   );
 }
