@@ -1,6 +1,6 @@
 {
   "name": "react-native-emoji-reactions",
-  "version": "0.1.12",
+  "version": "0.1.13",
   "description": "React native emoji reactions inpired by Slack",
   "main": "lib/commonjs/index",
   "module": "lib/module/index",
