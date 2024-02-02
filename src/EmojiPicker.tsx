@@ -174,11 +174,8 @@ const EmojiPickerwithHOC = gestureHandlerRootHOC(() => {
   }, [nbEmojisPerRow, recentEmojis, language, newTranslations]);
 
   const finalEmojiRows = useMemo(() => {
-    return [
-      ...(recentEmojiRows.length > 0 ? recentEmojiRows : []),
-      ...emojiRows,
-    ];
-  }, [emojiRows, recentEmojiRows]);
+    return [...(disableRecentlyUsed ? [] : recentEmojiRows), ...emojiRows];
+  }, [emojiRows, recentEmojiRows, disableRecentlyUsed]);
 
   const categories = useMemo(() => {
     const theCategories: Category[] = [];
