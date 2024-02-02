@@ -1,8 +1,8 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
-import { Image } from 'expo-image';
 import PngIcon from './PngIcon';
 import type { AvatarStyles, AvatarTheme } from '../../src/types';
+import { Image } from 'react-native';
 
 export default function Avatar({
   uri,
@@ -26,11 +26,7 @@ export default function Avatar({
       ]}
     >
       {uri ? (
-        <Image
-          source={{ uri }}
-          style={[defaultStyle.image, styles?.image]}
-          contentFit="cover"
-        />
+        <Image source={{ uri }} style={[defaultStyle.image, styles?.image]} />
       ) : (
         <PngIcon
           fill={theme?.icon}
@@ -57,6 +53,7 @@ const defaultStyle = StyleSheet.create({
     flex: 1,
     width: '100%',
     height: '100%',
+    resizeMode: 'contain',
   },
   defautImage: {
     tintColor: '#ffffff',

@@ -1,6 +1,7 @@
 import * as React from 'react';
+import type { ImageStyle } from 'react-native';
 import type { ImageSourcePropType } from 'react-native';
-import { Image, ImageStyle } from 'expo-image';
+import { Image } from 'react-native';
 import { StyleSheet } from 'react-native';
 
 export default function PngIcon({
@@ -22,6 +23,7 @@ export default function PngIcon({
 
 const defaultStyle = StyleSheet.create({
   image: {
+    resizeMode: 'contain',
     width: 22,
     height: 22,
   },

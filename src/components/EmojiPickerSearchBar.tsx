@@ -111,11 +111,13 @@ const defaultStyles = StyleSheet.create({
     tintColor: '#838287',
     width: 22,
     height: 22,
+    resizeMode: 'contain',
   },
   clearIcon: {
     tintColor: '#838287',
     width: 18,
     height: 18,
+    resizeMode: 'contain',
   },
   searchInputContainer: {
     flex: 1,

@@ -1,4 +1,4 @@
-import type { ImageStyle } from 'expo-image';
+import type { ImageStyle } from 'react-native';
 import type { ViewStyle, TextStyle } from 'react-native';
 
 export const CATEGORIES_NAVIGATION = [
