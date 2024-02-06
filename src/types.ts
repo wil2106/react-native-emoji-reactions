@@ -27,7 +27,7 @@ export type ReactionsProps = {
   hideAddButton?: boolean;
   onAddReaction: (emoji: string) => void;
   onRemoveReaction: (reactionId: string | number) => void;
-  onOpenUserProfile?: (userId: string | number) => void;
+  onPressReaction?: (reaction: ReactionType) => void;
   disableHaptics?: boolean;
   language?: string;
   newTranslations?: TranslationsType;
@@ -67,7 +67,7 @@ export type ReactionsRecordsProps = {
   open: boolean;
   reactionsGroups: ReactionGroupType[];
   onClose: () => void;
-  onPressUserRow?: (id: string | number) => void;
+  onPressReaction?: (reaction: ReactionType) => void;
   theme?: ReactionsRecordsTheme;
   styles?: ReactionsRecordsStyles;
   enableGroupChangeAnimation?: boolean;

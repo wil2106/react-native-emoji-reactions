@@ -235,8 +235,8 @@ export default function App() {
           reactions={reactions}
           onAddReaction={onAddReaction}
           onRemoveReaction={onRemoveReaction}
-          onOpenUserProfile={(userId) =>
-            console.log(`Open user profile with id: ${userId}`)
+          onPressReaction={(reaction) =>
+            console.log(`Open reaction: ${JSON.stringify(reaction)}`)
           }
           language={enableCustomTranslation ? 'fr' : undefined}
           newTranslations={{ fr }}

@@ -9,7 +9,7 @@ import { Dimensions, ScrollView, StyleSheet } from 'react-native';
 import CustomBackdrop from './components/CustomBackdrop';
 import ReactionsRecordsTabBar from './components/ReactionsRecordsTabBar';
 import UserItem from './components/UserItem';
-import type { ReactionsRecordsProps } from './types';
+import type { ReactionType, ReactionsRecordsProps } from './types';
 import { Modal } from 'react-native';
 import { gestureHandlerRootHOC } from 'react-native-gesture-handler';
 import { ReactionRecordsContext } from './context';
@@ -21,7 +21,7 @@ const ReactionsRecordsWithHOC = gestureHandlerRootHOC(() => {
     open,
     reactionsGroups,
     onClose,
-    onPressUserRow,
+    onPressReaction,
     theme,
     styles,
     enableGroupChangeAnimation,
@@ -59,12 +59,12 @@ const ReactionsRecordsWithHOC = gestureHandlerRootHOC(() => {
     );
   };
 
-  const onUserItemPress = (id: string | number) => {
-    if (!onPressUserRow) return;
-    // fire onPressUserRow
-    onPressUserRow(id);
+  const onReactionPress = (reaction: ReactionType) => {
+    if (!onPressReaction) return;
     // close bottomsheet
     bottomSheetRef.current?.dismiss();
+    // fire onPressReaction
+    onPressReaction(reaction);
   };
 
   return (
@@ -125,7 +125,7 @@ const ReactionsRecordsWithHOC = gestureHandlerRootHOC(() => {
               renderItem={({ item }) => (
                 <UserItem
                   user={item.user}
-                  onPress={() => onUserItemPress(item.user.id)}
+                  onPress={() => onReactionPress(item)}
                   theme={theme?.userItem}
                   styles={styles?.userItem}
                 />
@@ -145,7 +145,7 @@ export default function ReactionsRecords({
   open,
   reactionsGroups,
   onClose,
-  onPressUserRow,
+  onPressReaction,
   theme,
   styles,
   enableGroupChangeAnimation,
@@ -157,7 +157,7 @@ export default function ReactionsRecords({
           open,
           reactionsGroups,
           onClose,
-          onPressUserRow,
+          onPressReaction,
           theme,
           styles,
           enableGroupChangeAnimation,

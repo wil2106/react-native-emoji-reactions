@@ -13,7 +13,7 @@ export default function Reactions({
   hideAddButton,
   onAddReaction,
   onRemoveReaction,
-  onOpenUserProfile,
+  onPressReaction,
   disableHaptics,
   language,
   newTranslations,
@@ -141,7 +141,7 @@ export default function Reactions({
         open={reactionsRecordsOpened}
         reactionsGroups={groupedReactions}
         onClose={() => setReactionsRecordsOpened(false)}
-        onPressUserRow={onOpenUserProfile}
+        onPressReaction={onPressReaction}
         theme={theme?.reactionsRecords}
         styles={styles?.reactionsRecords}
         enableGroupChangeAnimation={reactionsRecordsEnableGroupChangeAnimation}
