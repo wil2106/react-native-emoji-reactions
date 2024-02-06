@@ -21,7 +21,7 @@ const ReactionsRecordsWithHOC = gestureHandlerRootHOC(() => {
     open,
     reactionsGroups,
     onClose,
-    onOpenUserProfile,
+    onPressUserRow,
     theme,
     styles,
     enableGroupChangeAnimation,
@@ -60,11 +60,11 @@ const ReactionsRecordsWithHOC = gestureHandlerRootHOC(() => {
   };
 
   const onUserItemPress = (id: string | number) => {
-    if (!onOpenUserProfile) return;
+    if (!onPressUserRow) return;
     // close bottomsheet
     bottomSheetRef.current?.dismiss();
     // open user profile
-    onOpenUserProfile(id);
+    onPressUserRow(id);
   };
 
   return (
@@ -145,7 +145,7 @@ export default function ReactionsRecords({
   open,
   reactionsGroups,
   onClose,
-  onOpenUserProfile,
+  onPressUserRow,
   theme,
   styles,
   enableGroupChangeAnimation,
@@ -157,7 +157,7 @@ export default function ReactionsRecords({
           open,
           reactionsGroups,
           onClose,
-          onOpenUserProfile,
+          onPressUserRow,
           theme,
           styles,
           enableGroupChangeAnimation,

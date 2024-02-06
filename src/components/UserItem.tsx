@@ -2,6 +2,7 @@ import React from 'react';
 import { StyleSheet, Text, TouchableOpacity } from 'react-native';
 import type { UserItemStyles, UserItemTheme, UserType } from '../../src/types';
 import Avatar from './Avatar';
+import { View } from 'react-native';
 
 export default function UserItem({
   user,
@@ -24,19 +25,36 @@ export default function UserItem({
         theme={theme?.avatar}
         styles={styles?.avatar}
       />
-      <Text
-        style={[
-          defaultStyles.name,
-          styles?.name,
-          theme?.name
-            ? {
-                color: theme.name,
-              }
-            : {},
-        ]}
-      >
-        {user.name}
-      </Text>
+      <View style={[defaultStyles.contentContainer, styles?.contentContainer]}>
+        <Text
+          style={[
+            defaultStyles.name,
+            styles?.name,
+            theme?.name
+              ? {
+                  color: theme.name,
+                }
+              : {},
+          ]}
+        >
+          {user.name}
+        </Text>
+        {!!user.description && (
+          <Text
+            style={[
+              defaultStyles.description,
+              styles?.description,
+              theme?.description
+                ? {
+                    color: theme.description,
+                  }
+                : {},
+            ]}
+          >
+            {user.description}
+          </Text>
+        )}
+      </View>
     </TouchableOpacity>
   );
 }
@@ -47,9 +65,17 @@ const defaultStyles = StyleSheet.create({
     alignItems: 'center',
     gap: 10,
   },
+  contentContainer: {
+    flexDirection: 'column',
+    gap: 2,
+  },
   name: {
     fontSize: 18,
     fontWeight: '600',
     color: '#1C1C1C',
+  },
+  description: {
+    fontSize: 10,
+    color: '#5F5F5F',
   },
 });

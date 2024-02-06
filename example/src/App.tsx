@@ -16,6 +16,7 @@ const REACTIONS = [
     user: {
       id: 88787,
       name: 'john',
+      description: 'Press here to delete',
       avatarUrl: 'https://picsum.photos/301',
     },
     emoji: '😃',

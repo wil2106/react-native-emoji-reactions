@@ -60,13 +60,14 @@ export type UserType = {
   id: string | number;
   name: string;
   avatarUrl?: string;
+  description?: string;
 };
 
 export type ReactionsRecordsProps = {
   open: boolean;
   reactionsGroups: ReactionGroupType[];
   onClose: () => void;
-  onOpenUserProfile?: (id: string | number) => void;
+  onPressUserRow?: (id: string | number) => void;
   theme?: ReactionsRecordsTheme;
   styles?: ReactionsRecordsStyles;
   enableGroupChangeAnimation?: boolean;
@@ -104,6 +105,7 @@ export type ReactionsRecordsTheme = {
 
 export type UserItemTheme = {
   name?: string;
+  description?: string;
   avatar?: AvatarTheme;
 };
 
@@ -207,7 +209,9 @@ export type ReactionsRecordsTabBarStyles = {
 
 export type UserItemStyles = {
   container?: ViewStyle;
+  contentContainer?: ViewStyle;
   name?: TextStyle;
+  description?: TextStyle;
   avatar?: AvatarStyles;
 };
 

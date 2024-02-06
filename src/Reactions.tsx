@@ -141,7 +141,7 @@ export default function Reactions({
         open={reactionsRecordsOpened}
         reactionsGroups={groupedReactions}
         onClose={() => setReactionsRecordsOpened(false)}
-        onOpenUserProfile={onOpenUserProfile}
+        onPressUserRow={onOpenUserProfile}
         theme={theme?.reactionsRecords}
         styles={styles?.reactionsRecords}
         enableGroupChangeAnimation={reactionsRecordsEnableGroupChangeAnimation}
