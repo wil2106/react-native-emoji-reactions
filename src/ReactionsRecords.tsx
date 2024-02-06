@@ -61,10 +61,10 @@ const ReactionsRecordsWithHOC = gestureHandlerRootHOC(() => {
 
   const onReactionPress = (reaction: ReactionType) => {
     if (!onPressReaction) return;
-    // close bottomsheet
-    bottomSheetRef.current?.dismiss();
     // fire onPressReaction
     onPressReaction(reaction);
+    // close bottomsheet
+    bottomSheetRef.current?.dismiss();
   };
 
   return (
