@@ -61,10 +61,10 @@ const ReactionsRecordsWithHOC = gestureHandlerRootHOC(() => {
 
   const onUserItemPress = (id: string | number) => {
     if (!onPressUserRow) return;
+    // fire onPressUserRow
+    onPressUserRow(id);
     // close bottomsheet
     bottomSheetRef.current?.dismiss();
-    // open user profile
-    onPressUserRow(id);
   };
 
   return (
